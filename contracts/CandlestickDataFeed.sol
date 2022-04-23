@@ -11,25 +11,28 @@ import './openzeppelin-solidity/contracts/SafeMath.sol';
 contract CandlestickDataFeed is ICandlestickDataFeed {
     using SafeMath for uint256;
 
+    /* ========== CONSTANTS ========== */
+
     // Maximum number of seconds between data feed updates before the data feed is considered outdated.
     uint256 public constant MAX_TIME_BETWEEN_UPDATES = 60;
 
     // Maximum timeframe of 60 minutes (1 hour).
     uint256 public constant MAX_CANDLESTICKS_TO_AGGREGATE = 60;
 
+    /* ========== STATE VARIABLES ========== */
+
+    // Timestamp at which this data feed was created.
+    uint256 public override createdOn;
+
     // Whether the data feed is halted.
     bool public isHalted;
 
     // Address of the user/contract responsible for supplying data to this contract.
-    address public dataProvider;
+    address public override dataProvider;
 
     // Address of the user/contract that can update the settings of this contract.
     // Operator is initially the contract owner.
     address public operator;
-
-    // Address of the user/contract that owns this contract.
-    // The contract owner can set the operator address.
-    address public immutable owner;
 
     // Address of the data feed's asset.
     // For assets deployed on multiple chains, the asset's native chain is used.
@@ -54,10 +57,9 @@ contract CandlestickDataFeed is ICandlestickDataFeed {
 
     /* ========== CONSTRUCTOR ========== */
 
-    constructor(address _dataProvider, address _owner, address _asset, string memory _symbol) {
+    constructor(address _dataProvider, address _operator, address _asset, string memory _symbol) {
         dataProvider = _dataProvider;
-        operator = _owner;
-        owner = _owner;
+        operator = _operator;
         asset = _asset;
         symbol = _symbol;
     }
@@ -228,7 +230,7 @@ contract CandlestickDataFeed is ICandlestickDataFeed {
     * @dev Only the contract owner can call this function.
     * @param _newOperator Address of the new operator.
     */
-    function setOperator(address _newOperator) external onlyOwner {
+    function setOperator(address _newOperator) external override onlyOperator {
         require(_newOperator != address(0), "CandlestickDataFeed: Invalid address for _newOperator.");
 
         operator = _newOperator;
@@ -241,18 +243,13 @@ contract CandlestickDataFeed is ICandlestickDataFeed {
     * @dev Only the contract operator can call this function.
     * @param _isHalted Whether to mark the contract as 'halted'.
     */
-    function haltDataFeed(bool _isHalted) external onlyOperator {
+    function haltDataFeed(bool _isHalted) external override onlyOperator {
         isHalted = _isHalted;
 
         emit HaltDataFeed(_isHalted);
     }
 
     /* ========== MODIFIERS ========== */
-
-    modifier onlyOwner() {
-        require(msg.sender == owner, "CandlestickDataFeed: Only the contract owner can call this function.");
-        _;
-    }
 
     modifier onlyOperator() {
         require(msg.sender == operator, "CandlestickDataFeed: Only the operator can call this function.");

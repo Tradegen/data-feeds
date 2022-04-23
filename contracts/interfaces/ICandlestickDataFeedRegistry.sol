@@ -3,12 +3,6 @@
 pragma solidity >=0.7.6;
 
 interface ICandlestickDataFeedRegistry {
-    struct DataFeed {
-        address dataFeedAddress;
-        address assetAddress;
-        address dedicatedDataProvider;
-    }
-
     /**
     * @notice Gets the current price of the given asset's data feed.
     * @dev Current price is the 'close' price of the latest candlestick.
@@ -58,9 +52,9 @@ interface ICandlestickDataFeedRegistry {
     * @notice Given the address of an asset, returns the asset's data feed info.
     * @dev Returns 0 or address(0) for each value if the given asset does not have a data feed.
     * @param _asset Address of the asset.
-    * @return (address, address, address, uint256) Address of the data feed, address of the data feed's asset, address of the dedicated data provider, current price.
+    * @return (address, address, address, uint256, uint256) Address of the data feed, address of the data feed's asset, address of the dedicated data provider, timestamp when the data feed was created, current price.
     */
-    function getDataFeedInfo(address _asset) external view returns (address, address, address, uint256);
+    function getDataFeedInfo(address _asset) external view returns (address, address, address, uint256, uint256);
 
     /**
     * @notice Given the address of an asset, returns the address of the asset's data feed.
@@ -95,11 +89,19 @@ interface ICandlestickDataFeedRegistry {
     function aggregateCandleSticks(address _asset, uint256 _numberOfCandlesticks) external view returns (uint256, uint256, uint256, uint256, uint256, uint256);
 
     /**
+    * @notice Given the address of an asset, returns whether the asset has a data feed.
+    * @param _asset Address of the asset.
+    * @return bool Whether the given asset has a data feed.
+    */
+    function hasDataFeed(address _asset) external view returns (bool);
+
+    /**
     * @notice Registers a new data feed to the platform.
     * @dev Only the contract operator can call this function.
     * @dev Transaction will revert if a data feed already exists for the given asset.
     * @param _asset Address of the asset.
+    * @param _symbol Symbol of the asset.
     * @param _dedicatedDataProvider Address of the data provider responsible for this data feed.
     */
-    function registerDataFeed(address _asset, address _dedicatedDataProvider) external;
+    function registerDataFeed(address _asset, string memory _symbol, address _dedicatedDataProvider) external;
 }

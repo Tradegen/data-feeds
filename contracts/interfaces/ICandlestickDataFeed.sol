@@ -78,6 +78,16 @@ interface ICandlestickDataFeed {
     function aggregateCandleSticks(uint256 _numberOfCandlesticks) external view returns (uint256, uint256, uint256, uint256, uint256, uint256);
 
     /**
+    * @notice Returns the timestamp at which this data feed was created.
+    */
+    function createdOn() external view returns (uint256);
+
+    /**
+    * @notice Returns the address of this data feed's data provider.
+    */
+    function dataProvider() external view returns (address);
+
+    /**
     * @notice Updates the data feed's latest candlestick data with the given data.
     * @dev This function can only be called by the dedicated data provider.
     * @dev Data is based on a 1-minute timeframe.
@@ -97,4 +107,18 @@ interface ICandlestickDataFeed {
     * @param _newProvider Address of the new data provider.
     */
     function updateDedicatedDataProvider(address _newProvider) external;
+
+    /**
+    * @notice Updates the operator of this contract.
+    * @dev Only the contract owner can call this function.
+    * @param _newOperator Address of the new operator.
+    */
+    function setOperator(address _newOperator) external;
+
+    /**
+    * @notice Sets the data feed's 'halted' status.
+    * @dev Only the contract operator can call this function.
+    * @param _isHalted Whether to mark the contract as 'halted'.
+    */
+    function haltDataFeed(bool _isHalted) external;
 }
