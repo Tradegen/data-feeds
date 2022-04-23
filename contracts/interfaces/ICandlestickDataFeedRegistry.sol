@@ -77,6 +77,24 @@ interface ICandlestickDataFeedRegistry {
     function lastUpdated(address _asset) external view returns (uint256);
 
     /**
+    * @notice Returns the status of the given asset's data feed.
+    * @param _asset Address of the asset.
+    */
+    function getDataFeedStatus(address _asset) external view returns (uint256);
+
+    /**
+    * @notice Aggregates the given number of candlesticks into one candlestick, representing a higher timeframe.
+    * @dev If there are not enough candlesticks in the data feed's history, the function will aggregate all candlesticks in the data feed's history.
+    *      Ex) If user wants to aggregate 60 candlesticks but the data feed only has 50 candlesticks, the function will return a candlestick of size 50 instead of 60.
+    * @dev It is not recommended to aggregate more than 10 candlesticks due to gas.
+    * @dev Returns 0 for each value if the given asset does not have a data feed.
+    * @param _asset Address of the asset.
+    * @param _numberOfCandlesticks Number of candlesticks to aggregate.
+    * @return (uint256, uint256, uint256, uint256, uint256, uint256) High price, low price, open price, close price, total volume, and starting timestamp.
+    */
+    function aggregateCandleSticks(address _asset, uint256 _numberOfCandlesticks) external view returns (uint256, uint256, uint256, uint256, uint256, uint256);
+
+    /**
     * @notice Registers a new data feed to the platform.
     * @dev Only the contract operator can call this function.
     * @dev Transaction will revert if a data feed already exists for the given asset.
