@@ -56,6 +56,13 @@ interface ICandlestickDataFeed {
     function lastUpdated() external view returns (uint256);
 
     /**
+    * @notice Returns the timestamp at which the update at the given index was made.
+    * @param _index Index in this data feed's history of updates.
+    * @return uint256 Timestamp at which the update was made.
+    */
+    function getIndexTimestamp(uint256 _index) external view returns (uint256);
+
+    /**
     * @notice Updates the data feed's latest candlestick data with the given data.
     * @dev This function can only be called by the dedicated data provider.
     * @dev Data is based on a 1-minute timeframe.
