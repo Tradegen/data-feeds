@@ -151,7 +151,7 @@ contract CandlestickDataFeed is ICandlestickDataFeed {
     * @param _numberOfCandlesticks Number of candlesticks to aggregate.
     * @return (uint256, uint256, uint256, uint256, uint256, uint256) High price, low price, open price, close price, total volume, and starting timestamp.
     */
-    function aggregateCandleSticks(uint256 _numberOfCandlesticks) external view override returns (uint256, uint256, uint256, uint256, uint256, uint256) {
+    function aggregateCandlesticks(uint256 _numberOfCandlesticks) external view override returns (uint256, uint256, uint256, uint256, uint256, uint256) {
         require(_numberOfCandlesticks > 1, "CandlestickDataFeed: Number of candlesticks must be greater than 1.");
         require(_numberOfCandlesticks <= MAX_CANDLESTICKS_TO_AGGREGATE, "CandlestickDataFeed: Number of candlesticks cannot be greater than 60.");
 

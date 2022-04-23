@@ -75,7 +75,7 @@ interface ICandlestickDataFeed {
     * @param _numberOfCandlesticks Number of candlesticks to aggregate.
     * @return (uint256, uint256, uint256, uint256, uint256, uint256) High price, low price, open price, close price, total volume, and starting timestamp.
     */
-    function aggregateCandleSticks(uint256 _numberOfCandlesticks) external view returns (uint256, uint256, uint256, uint256, uint256, uint256);
+    function aggregateCandlesticks(uint256 _numberOfCandlesticks) external view returns (uint256, uint256, uint256, uint256, uint256, uint256);
 
     /**
     * @notice Returns the timestamp at which this data feed was created.
