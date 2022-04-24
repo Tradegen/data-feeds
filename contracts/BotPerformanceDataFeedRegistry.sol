@@ -194,7 +194,7 @@ contract BotPerformanceDataFeedRegistry is IBotPerformanceDataFeedRegistry, Owna
         require(dataFeeds[_tradingBot] == address(0), "BotPerformanceDataFeedRegistry: Already have a data feed for this trading bot.");
         require(_usageFee >= 0, "BotPerformanceDataFeedRegistry: Usage fee must be positive.");
 
-        address dataFeed = address(new BotPerformanceDataFeed(_dedicatedDataProvider, operator, feePool, candlestickDataFeedRegistry, _tradingBot, feeToken, _usageFee));
+        address dataFeed = address(new BotPerformanceDataFeed(_dedicatedDataProvider, address(this), feePool, candlestickDataFeedRegistry, _tradingBot, feeToken, _usageFee));
 
         dataFeeds[_tradingBot] = dataFeed;
         numberOfDataFeeds = numberOfDataFeeds.add(1);
