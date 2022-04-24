@@ -62,6 +62,7 @@ contract CandlestickDataFeed is ICandlestickDataFeed {
         operator = _operator;
         asset = _asset;
         symbol = _symbol;
+        createdOn = block.timestamp;
     }
 
     /* ========== VIEWS ========== */

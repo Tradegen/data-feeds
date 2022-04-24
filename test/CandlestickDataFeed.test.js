@@ -289,7 +289,7 @@ describe("CandlestickDataFeed", () => {
         let status = await dataFeed.getDataFeedStatus();
         expect(status).to.equal(0);
     });
-  });*/
+  });
 
   describe("#aggregateCandlesticks", () => {
     it("2 candlesticks", async () => {
@@ -354,5 +354,5 @@ describe("CandlestickDataFeed", () => {
         expect(aggregatedCandlestick[4]).to.equal(parseEther("1200"));
         expect(aggregatedCandlestick[5]).to.equal(Number(currentTime) + 10);
     });
-  });
+  });*/
 });

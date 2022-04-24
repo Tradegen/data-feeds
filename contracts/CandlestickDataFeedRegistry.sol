@@ -318,7 +318,7 @@ contract CandlestickDataFeedRegistry is ICandlestickDataFeedRegistry, Ownable {
         require(dataFeeds[_asset] == address(0), "CandlestickDataFeedRegistry: Already have a data feed for this asset.");
         require(symbols[_symbol] == address(0), "CandlestickDataFeedRegistry: Symbol already exists.");
 
-        address dataFeed = address(new CandlestickDataFeed(_dedicatedDataProvider, operator, _asset, _symbol));
+        address dataFeed = address(new CandlestickDataFeed(_dedicatedDataProvider, address(this), _asset, _symbol));
 
         dataFeeds[_asset] = dataFeed;
         numberOfDataFeeds = numberOfDataFeeds.add(1);
