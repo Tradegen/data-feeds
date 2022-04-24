@@ -21,11 +21,4 @@ interface IFeePool {
     * @notice Claims all available fees for msg.sender.
     */
     function claimFees() external;
-
-    /**
-    * @notice Sets the address of the dedicated fee supplier.
-    * @dev Only the contract operator can call this function.
-    * @param _newSupplier Address of the new fee supplier.
-    */
-    function setFeeSupplier(address _newSupplier) external;
 }

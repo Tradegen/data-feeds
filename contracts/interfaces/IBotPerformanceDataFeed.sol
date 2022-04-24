@@ -67,8 +67,9 @@ interface IBotPerformanceDataFeed {
      * @param _asset Address of the asset.
      * @param _isBuy Whether the order is a 'buy' order
      * @param _price Price at which the order executed.
+      * @param _timestamp Timestamp when the order was executed.
      */
-    function updateData(address _asset, bool _isBuy, uint256 _price) external;
+    function updateData(address _asset, bool _isBuy, uint256 _price, uint256 _timestamp) external;
 
     /**
     * @notice Updates the address of the data provider allowed to update this data feed.

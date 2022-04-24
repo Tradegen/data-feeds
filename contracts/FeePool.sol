@@ -17,16 +17,14 @@ contract FeePool is IFeePool, Ownable, ReentrancyGuard {
 
     IERC20 public immutable feeToken;
     address public operator;
-    address public feeSupplier;
 
     mapping (address => uint256) public override availableFees;
 
     /* ========== CONSTRUCTOR ========== */
 
-    constructor(address _operator, address _feeToken, address _feeSupplier) Ownable() {
+    constructor(address _operator, address _feeToken) Ownable() {
         operator = _operator;
         feeToken = IERC20(_feeToken);
-        feeSupplier = _feeSupplier;
     }
 
     /* ========== MUTATIVE FUNCTIONS ========== */
@@ -34,11 +32,10 @@ contract FeePool is IFeePool, Ownable, ReentrancyGuard {
     /**
     * @notice Adds fees to the given account.
     * @dev Assumes that this contract has allowance for fee token when transfering token.
-    * @dev Only the dedicated fee supplier can call this function.
     * @param _account Address of the user to add fees to.
     * @param _amount Amount of fee tokens to transfer.
     */
-    function addFees(address _account, uint256 _amount) external override onlyFeeSupplier nonReentrant {
+    function addFees(address _account, uint256 _amount) external override nonReentrant {
         availableFees[_account] = availableFees[_account].add(_amount);
 
         feeToken.safeTransferFrom(msg.sender, address(this), _amount);
@@ -61,19 +58,6 @@ contract FeePool is IFeePool, Ownable, ReentrancyGuard {
     /* ========== RESTRICTED FUNCTIONS ========== */
 
     /**
-    * @notice Sets the address of the dedicated fee supplier.
-    * @dev Only the contract operator can call this function.
-    * @param _newSupplier Address of the new fee supplier.
-    */
-    function setFeeSupplier(address _newSupplier) external override onlyOperator {
-        require(_newSupplier != address(0), "FeePool: Invalid address for _newSupplier.");
-
-        feeSupplier = _newSupplier;
-
-        emit SetFeeSupplier(_newSupplier);
-    }
-
-    /**
     * @notice Sets the address of the operator.
     * @dev Only the contract owner can call this function.
     * @param _newOperator Address of the new fee operator.
@@ -93,14 +77,8 @@ contract FeePool is IFeePool, Ownable, ReentrancyGuard {
         _;
     }
 
-    modifier onlyFeeSupplier() {
-        require(msg.sender == feeSupplier, "FeePool: Only the fee supplier can call this function.");
-        _;
-    }
-
     /* ========== EVENTS ========== */
 
-    event SetFeeSupplier(address _newSupplier);
     event ClaimedFees(address user, uint256 amount);
     event AddedFees(address user, uint256 amount);
     event SetOperator(address _newOperator);

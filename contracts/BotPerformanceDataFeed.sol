@@ -75,7 +75,7 @@ contract BotPerformanceDataFeed is IBotPerformanceDataFeed {
 
     // (update index => order info).
     // Starts at index 1.
-    mapping (uint256 => Order) private orders;
+    mapping (uint256 => Order) internal orders;
 
     // (update index => timestamp at which the update was made).
     mapping (uint256 => uint256) public indexTimestamps;
@@ -92,6 +92,7 @@ contract BotPerformanceDataFeed is IBotPerformanceDataFeed {
         tradingBot = _tradingBot;
         feeToken = _feeToken;
         usageFee = _usageFee;
+        createdOn = block.timestamp;
     }
 
     /* ========== VIEWS ========== */
@@ -145,8 +146,9 @@ contract BotPerformanceDataFeed is IBotPerformanceDataFeed {
      * @param _asset Address of the asset.
      * @param _isBuy Whether the order is a 'buy' order
      * @param _price Price at which the order executed.
+     * @param _timestamp Timestamp when the order was executed.
      */
-    function updateData(address _asset, bool _isBuy, uint256 _price) external override onlyDataProvider notHalted {
+    function updateData(address _asset, bool _isBuy, uint256 _price, uint256 _timestamp) external override onlyDataProvider notHalted {
         // Gas savings.
         uint256 index = numberOfUpdates.add(1);
         uint256 botPrice = _calculateTokenPrice();
@@ -154,7 +156,7 @@ contract BotPerformanceDataFeed is IBotPerformanceDataFeed {
         orders[index] = Order({
             asset: _asset,
             isBuy: _isBuy,
-            timestamp: block.timestamp,
+            timestamp: _timestamp,
             assetPrice: _price,
             newBotPrice: botPrice
         });
@@ -179,9 +181,11 @@ contract BotPerformanceDataFeed is IBotPerformanceDataFeed {
         IERC20(feeToken).approve(address(feePool), usageFee);
         feePool.addFees(ITradingBot(tradingBot).owner(), usageFee);
 
-        emit GetTokenPrice(msg.sender, usageFee);
+        uint256 price = _calculateTokenPrice();
 
-        return _calculateTokenPrice();
+        emit GetTokenPrice(msg.sender, usageFee, price);
+
+        return price;
     }
 
     /* ========== INTERNAL FUNCTIONS ========== */
@@ -295,5 +299,5 @@ contract BotPerformanceDataFeed is IBotPerformanceDataFeed {
     event SetOperator(address newOperator);
     event HaltDataFeed(bool isHalted);
     event UpdatedUsageFee(uint256 newFee);
-    event GetTokenPrice(address caller, uint256 amountPaid);
+    event GetTokenPrice(address caller, uint256 amountPaid, uint256 tokenPrice);
 }
