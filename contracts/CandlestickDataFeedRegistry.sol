@@ -25,7 +25,7 @@ contract CandlestickDataFeedRegistry is ICandlestickDataFeedRegistry, Ownable {
     // Keeps track of the total number of data feeds registered under this contract.
     uint256 public numberOfDataFeeds;
 
-    // (address => asset's data feed address).
+    // (asset address => asset's data feed address).
     mapping (address => address) public dataFeeds;
 
     // (asset symbol => address of asset on its native chain).
@@ -302,6 +302,8 @@ contract CandlestickDataFeedRegistry is ICandlestickDataFeedRegistry, Ownable {
         return hasDataFeed(symbols[_symbol]);
     }
 
+    /* ========== RESTRICTED FUNCTIONS ========== */
+
     /**
     * @notice Registers a new data feed to the platform.
     * @dev Only the contract operator can call this function.
@@ -325,8 +327,6 @@ contract CandlestickDataFeedRegistry is ICandlestickDataFeedRegistry, Ownable {
 
         emit RegisteredDataFeed(_asset, _symbol, _dedicatedDataProvider, dataFeed);
     }
-
-    /* ========== RESTRICTED FUNCTIONS ========== */
 
     /**
     * @notice Updates the operator of this contract.

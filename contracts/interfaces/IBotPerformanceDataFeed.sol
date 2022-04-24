@@ -35,11 +35,29 @@ interface IBotPerformanceDataFeed {
     function lastUpdated() external view returns (uint256);
 
     /**
+    * @notice Returns the status of this data feed.
+    * @dev 0 = Active.
+    * @dev 1 = Outdated.
+    * @dev 2 = Halted.
+    */
+    function getDataFeedStatus() external view returns (uint256);
+
+    /**
     * @notice Returns the timestamp at which the update at the given index was made.
     * @param _index Index in this data feed's history of updates.
     * @return uint256 Timestamp at which the update was made.
     */
     function getIndexTimestamp(uint256 _index) external view returns (uint256);
+
+    /**
+    * @notice Returns the timestamp at which this data feed was created.
+    */
+    function createdOn() external view returns (uint256);
+
+    /**
+    * @notice Returns the address of this data feed's data provider.
+    */
+    function dataProvider() external view returns (address);
 
     /**
      * @notice Adds the order to the ledger and updates the trading bot's token price.
@@ -62,23 +80,28 @@ interface IBotPerformanceDataFeed {
     /**
      * @notice Returns the order info at the given index.
      * @param _index Index of the order.
-     * @return (address, bool, uint256, uint256, uint256) Address of the asset, whether the order was a 'buy', timestamp, asset's price, new trading bot token price.
+     * @return (address, bool, uint256, uint256) Address of the asset, whether the order was a 'buy', timestamp, asset's price.
      */
-    function getOrderInfo(uint256 _index) external view returns (address, bool, uint256, uint256, uint256);
+    function getOrderInfo(uint256 _index) external view returns (address, bool, uint256, uint256);
 
     /**
      * @notice Returns the current token price of the trading bot.
-     * @dev This function can only be called by a user or the BotPerformanceDataFeedRegistry contract.
-     * @dev Users calling this function don't need to pay the usage fee.
-     * @return (uint256) Price of the trading bot's token, in USD.
-     */
-    function getTokenPriceExternal() external view returns (uint256);
-
-    /**
-     * @notice Returns the current token price of the trading bot.
-     * @dev This function can only be called by a contract.
      * @dev Contracts calling this function need to pay the usage fee.
      * @return (uint256) Price of the trading bot's token, in USD.
      */
-    function getTokenPriceFromContract() external returns (uint256);
+    function getTokenPrice() external returns (uint256);
+
+    /**
+    * @notice Sets the data feed's 'halted' status.
+    * @dev Only the contract operator can call this function.
+    * @param _isHalted Whether to mark the contract as 'halted'.
+    */
+    function haltDataFeed(bool _isHalted) external;
+
+    /**
+    * @notice Updates the operator of this contract.
+    * @dev Only the contract owner can call this function.
+    * @param _newOperator Address of the new operator.
+    */
+    function setOperator(address _newOperator) external;
 }
