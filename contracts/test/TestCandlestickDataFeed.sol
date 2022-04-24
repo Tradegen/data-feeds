@@ -11,4 +11,8 @@ contract TestCandlestickDataFeed is CandlestickDataFeed {
     function setLastUpdated(uint256 _lastUpdated) external  {
         lastUpdated = _lastUpdated;
     }
+
+    function getCurrentTime() external view returns (uint256) {
+        return block.timestamp;
+    }
 }

@@ -1,6 +1,6 @@
 const { expect } = require("chai");
 const { parseEther } = require("@ethersproject/units");
-
+/*
 describe("FeePool", () => {
   let deployer;
   let otherUser;
@@ -129,4 +129,4 @@ describe("FeePool", () => {
         expect(availableFees).to.equal(0);
     });
   });
-});
+});*/

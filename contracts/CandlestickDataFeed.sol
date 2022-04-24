@@ -160,8 +160,8 @@ contract CandlestickDataFeed is ICandlestickDataFeed {
         uint256 currentIndex = (endingIndex >= _numberOfCandlesticks) ? endingIndex.sub(_numberOfCandlesticks).add(1) : 1;
 
         uint256 totalVolume;
-        uint256 high;
-        uint256 low;
+        uint256 high = candlesticks[currentIndex].high;
+        uint256 low = candlesticks[currentIndex].low;
         uint256 startingTimestamp = candlesticks[currentIndex].startingTimestamp;
         uint256 open = candlesticks[currentIndex].open;
         uint256 close = candlesticks[endingIndex].close;
@@ -190,6 +190,8 @@ contract CandlestickDataFeed is ICandlestickDataFeed {
     * @param _startingTimestamp Timestamp at the start of the candlestick.
     */
     function updateData(uint256 _high, uint256 _low, uint256 _open, uint256 _close, uint256 _volume, uint256 _startingTimestamp) external override onlyDataProvider notHalted {
+        require(_startingTimestamp >= lastUpdated, "CandlestickDataFeed: Starting timestamp must be in the future.");
+        
         // Gas savings.
         uint256 index = numberOfUpdates.add(1);
 
