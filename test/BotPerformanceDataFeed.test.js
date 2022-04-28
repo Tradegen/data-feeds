@@ -1,6 +1,6 @@
 const { expect } = require("chai");
 const { parseEther } = require("@ethersproject/units");
-/*
+
 describe("BotPerformanceDataFeedRegistry", () => {
   let deployer;
   let otherUser;
@@ -328,4 +328,4 @@ describe("BotPerformanceDataFeedRegistry", () => {
         expect(status).to.equal(0);
     });
   });
-});*/
+});

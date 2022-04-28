@@ -10,11 +10,7 @@ describe("BotPerformanceDataFeedRegistry", () => {
   let feeToken;
   let feeTokenAddress;
   let TokenFactory;
-
-  let candlestickDataFeed;
-  let candlestickDataFeedAddress;
-  let CandlestickDataFeedFactory;
-
+  
   let tradingBot;
   let tradingBotAddress;
   let TradingBotFactory;
@@ -83,7 +79,7 @@ describe("BotPerformanceDataFeedRegistry", () => {
   });
   
   describe("#registerDataFeed", () => {
-    it("onlyOperator", async () => {
+    it("onlyRegistrar", async () => {
       let tx = botPerformanceDataFeedRegistry.connect(otherUser).registerDataFeed(tradingBotAddress, parseEther("1"), deployer.address);
       await expect(tx).to.be.reverted;
 
@@ -161,6 +157,24 @@ describe("BotPerformanceDataFeedRegistry", () => {
 
         let isHalted1 = await botPerformanceDataFeed.isHalted();
         expect(isHalted1).to.be.true;
+    });
+  });
+
+  describe("#setRegistrar", () => {
+    it("onlyOwner", async () => {
+      let tx = botPerformanceDataFeedRegistry.connect(otherUser).setRegistrar(otherUser.address);
+      await expect(tx).to.be.reverted;
+
+      let registrar = await botPerformanceDataFeedRegistry.registrar();
+      expect(registrar).to.equal(deployer.address);
+    });
+
+    it("meets requirements", async () => {
+        let tx = await botPerformanceDataFeedRegistry.setRegistrar(otherUser.address);
+        await tx.wait();
+
+        let registrar = await botPerformanceDataFeedRegistry.registrar();
+        expect(registrar).to.equal(otherUser.address);
     });
   });
   

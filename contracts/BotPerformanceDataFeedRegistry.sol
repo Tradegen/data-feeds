@@ -21,13 +21,17 @@ contract BotPerformanceDataFeedRegistry is IBotPerformanceDataFeedRegistry, Owna
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
-    address public immutable feeToken;
-    address public immutable feePool;
-    address public immutable candlestickDataFeedRegistry;
+    address immutable feeToken;
+    address immutable feePool;
+    address immutable candlestickDataFeedRegistry;
 
     // Address of the user/contract that can update the settings of this contract.
     // Operator is initially the contract owner.
     address public operator;
+
+    // Address of the user/contract that can register new data feeds.
+    // Registrar is initially the contract owner.
+    address public registrar;
 
     // Keeps track of the total number of data feeds registered under this contract.
     uint256 public numberOfDataFeeds;
@@ -43,6 +47,7 @@ contract BotPerformanceDataFeedRegistry is IBotPerformanceDataFeedRegistry, Owna
 
     constructor(address _feePool, address _candlestickDataFeedRegistry, address _feeToken) Ownable() {
         operator = msg.sender;
+        registrar = msg.sender;
         feePool = _feePool;
         candlestickDataFeedRegistry = _candlestickDataFeedRegistry;
         feeToken = _feeToken;
@@ -188,9 +193,7 @@ contract BotPerformanceDataFeedRegistry is IBotPerformanceDataFeedRegistry, Owna
     * @param _usageFee Number of fee tokens to charge whenever a contract queries the data feed.
     * @param _dedicatedDataProvider Address of the data provider responsible for this data feed.
     */
-    function registerDataFeed(address _tradingBot, uint256 _usageFee, address _dedicatedDataProvider) external override onlyOperator {
-        require(_tradingBot != address(0), "BotPerformanceDataFeedRegistry: Invalid address for _tradingBot.");
-        require(_dedicatedDataProvider != address(0), "BotPerformanceDataFeedRegistry: Invalid address for _dedicatedDataProvider.");
+    function registerDataFeed(address _tradingBot, uint256 _usageFee, address _dedicatedDataProvider) external override onlyRegistrar {
         require(dataFeeds[_tradingBot] == address(0), "BotPerformanceDataFeedRegistry: Already have a data feed for this trading bot.");
         require(_usageFee >= 0, "BotPerformanceDataFeedRegistry: Usage fee must be positive.");
 
@@ -209,8 +212,6 @@ contract BotPerformanceDataFeedRegistry is IBotPerformanceDataFeedRegistry, Owna
     * @param _newOperator Address of the new operator.
     */
     function setOperator(address _newOperator) external onlyOwner {
-        require(_newOperator != address(0), "BotPerformanceDataFeedRegistry: Invalid address for _newOperator.");
-
         // Update the operator of each data feed first.
         uint256 n = numberOfDataFeeds;
         for (uint256 i = 1; i <= n; i++) {
@@ -220,6 +221,17 @@ contract BotPerformanceDataFeedRegistry is IBotPerformanceDataFeedRegistry, Owna
         operator = _newOperator;
 
         emit SetOperator(_newOperator);
+    }
+
+    /**
+    * @notice Updates the registrar address.
+    * @dev Only the contract owner can call this function.
+    * @param _newRegistrar Address of the new registrar.
+    */
+    function setRegistrar(address _newRegistrar) external onlyOwner {
+        registrar = _newRegistrar;
+
+        emit SetRegistrar(_newRegistrar);
     }
 
     /**
@@ -268,8 +280,14 @@ contract BotPerformanceDataFeedRegistry is IBotPerformanceDataFeedRegistry, Owna
         _;
     }
 
+    modifier onlyRegistrar() {
+        require(msg.sender == registrar, "BotPerformanceDataFeedRegistry: Only the registrar can call this function.");
+        _;
+    }
+
     /* ========== EVENTS ========== */
 
     event RegisteredDataFeed(address tradingBot, uint256 usageFee, address dedicatedDataProvider, address dataFeed);
     event SetOperator(address newOperator);
+    event SetRegistrar(address newRegistrar);
 }

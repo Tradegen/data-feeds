@@ -22,6 +22,10 @@ contract CandlestickDataFeedRegistry is ICandlestickDataFeedRegistry, Ownable {
     // Operator is initially the contract owner.
     address public operator;
 
+    // Address of the user/contract that can register new data feeds.
+    // Registrar is initially the contract owner.
+    address public registrar;
+
     // Keeps track of the total number of data feeds registered under this contract.
     uint256 public numberOfDataFeeds;
 
@@ -39,6 +43,7 @@ contract CandlestickDataFeedRegistry is ICandlestickDataFeedRegistry, Ownable {
 
     constructor() Ownable() {
         operator = msg.sender;
+        registrar = msg.sender;
     }
 
     /* ========== VIEWS ========== */
@@ -312,7 +317,7 @@ contract CandlestickDataFeedRegistry is ICandlestickDataFeedRegistry, Ownable {
     * @param _symbol Symbol of the asset.
     * @param _dedicatedDataProvider Address of the data provider responsible for this data feed.
     */
-    function registerDataFeed(address _asset, string memory _symbol, address _dedicatedDataProvider) external override onlyOperator {
+    function registerDataFeed(address _asset, string memory _symbol, address _dedicatedDataProvider) external override onlyRegistrar {
         require(_asset != address(0), "CandlestickDataFeedRegistry: Invalid address for _asset.");
         require(_dedicatedDataProvider != address(0), "CandlestickDataFeedRegistry: Invalid address for _dedicatedDataProvider.");
         require(dataFeeds[_asset] == address(0), "CandlestickDataFeedRegistry: Already have a data feed for this asset.");
@@ -345,6 +350,19 @@ contract CandlestickDataFeedRegistry is ICandlestickDataFeedRegistry, Ownable {
         operator = _newOperator;
 
         emit SetOperator(_newOperator);
+    }
+
+    /**
+    * @notice Updates the registrar address.
+    * @dev Only the contract owner can call this function.
+    * @param _newRegistrar Address of the new registrar.
+    */
+    function setRegistrar(address _newRegistrar) external onlyOwner {
+        require(_newRegistrar != address(0), "CandlestickDataFeedRegistry: Invalid address for _newRegistrar.");
+
+        registrar = _newRegistrar;
+
+        emit SetRegistrar(_newRegistrar);
     }
 
     /**
@@ -393,8 +411,14 @@ contract CandlestickDataFeedRegistry is ICandlestickDataFeedRegistry, Ownable {
         _;
     }
 
+    modifier onlyRegistrar() {
+        require(msg.sender == registrar, "CandlestickDataFeedRegistry: Only the registrar can call this function.");
+        _;
+    }
+
     /* ========== EVENTS ========== */
 
     event RegisteredDataFeed(address asset, string symbol, address dedicatedDataProvider, address dataFeed);
     event SetOperator(address newOperator);
+    event SetRegistrar(address newRegistrar);
 }

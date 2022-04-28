@@ -1,6 +1,6 @@
 const { expect } = require("chai");
 const { parseEther } = require("@ethersproject/units");
-/*
+
 describe("CandlestickDataFeedRegistry", () => {
   let deployer;
   let otherUser;
@@ -43,7 +43,7 @@ describe("CandlestickDataFeedRegistry", () => {
   });
   
   describe("#registerDataFeed", () => {
-    it("onlyOperator", async () => {
+    it("onlyRegistrar", async () => {
       let tx = registry.connect(otherUser).registerDataFeed(testTokenAddress, "TEST", otherUser.address);
       await expect(tx).to.be.reverted;
 
@@ -127,6 +127,24 @@ describe("CandlestickDataFeedRegistry", () => {
 
         let isHalted1 = await dataFeed.isHalted();
         expect(isHalted1).to.be.true;
+    });
+  });
+
+  describe("#setRegistrar", () => {
+    it("onlyOwner", async () => {
+      let tx = registry.connect(otherUser).setRegistrar(otherUser.address);
+      await expect(tx).to.be.reverted;
+
+      let registrar = await registry.registrar();
+      expect(registrar).to.equal(deployer.address);
+    });
+
+    it("meets requirements", async () => {
+        let tx = await registry.setRegistrar(otherUser.address);
+        await tx.wait();
+
+        let registrar = await registry.registrar();
+        expect(registrar).to.equal(otherUser.address);
     });
   });
   
@@ -367,4 +385,4 @@ describe("CandlestickDataFeedRegistry", () => {
         expect(aggregatedCandlestickFromSymbol[4]).to.equal(aggregatedCandlestick[4]);
     });
   });
-});*/
+});

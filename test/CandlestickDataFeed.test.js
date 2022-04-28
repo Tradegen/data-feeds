@@ -32,7 +32,7 @@ describe("CandlestickDataFeed", () => {
     await dataFeed.deployed();
     dataFeedAddress = dataFeed.address;
   });
-  /*
+  
   describe("#setOperator", () => {
     it("onlyOwner", async () => {
       let tx = dataFeed.connect(otherUser).setOperator(otherUser.address);
@@ -354,5 +354,5 @@ describe("CandlestickDataFeed", () => {
         expect(aggregatedCandlestick[4]).to.equal(parseEther("1200"));
         expect(aggregatedCandlestick[5]).to.equal(Number(currentTime) + 10);
     });
-  });*/
+  });
 });
