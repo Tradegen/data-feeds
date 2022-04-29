@@ -27,14 +27,6 @@ interface IBotPerformanceDataFeedRegistry {
     function getDataFeedInfo(address _tradingBot) external view returns (address, address, address, address, uint256);
 
     /**
-    * @notice Given the address of a trading bot, returns the address of the trading bot's data feed.
-    * @dev Returns address(0) if the given trading bot does not have a data feed.
-    * @param _tradingBot Address of the trading bot.
-    * @return address Address of the data feed.
-    */
-    function getDataFeedAddress(address _tradingBot) external view returns (address);
-
-    /**
     * @notice Returns the timestamp at which the given trading bot's data feed was last updated.
     * @dev Returns 0 if the given trading bot does not have a data feed.
     * @param _tradingBot Address of the trading bot.
@@ -59,9 +51,9 @@ interface IBotPerformanceDataFeedRegistry {
      * @dev Returns 0 for each value if the trading bot does not have a data feed or the given index is out of bounds.
      * @param _tradingBot Address of the trading bot.
      * @param _index Index of the order.
-     * @return (address, bool, uint256, uint256) Address of the asset, whether the order was a 'buy', timestamp, asset's price.
+     * @return (string, bool, uint256, uint256) Symbol of the asset, whether the order was a 'buy', timestamp, asset's price.
      */
-    function getOrderInfo(address _tradingBot, uint256 _index) external view returns (address, bool, uint256, uint256);
+    function getOrderInfo(address _tradingBot, uint256 _index) external view returns (string memory, bool, uint256, uint256);
 
     /**
      * @notice Returns the current token price of the given trading bot.

@@ -34,10 +34,6 @@ contract CandlestickDataFeed is ICandlestickDataFeed {
     // Operator is initially the contract owner.
     address public operator;
 
-    // Address of the data feed's asset.
-    // For assets deployed on multiple chains, the asset's native chain is used.
-    address public immutable asset;
-
     // Symbol of the data feed's asset.
     // Ex) BTC, ETH, CELO, etc.
     string public symbol;
@@ -57,10 +53,9 @@ contract CandlestickDataFeed is ICandlestickDataFeed {
 
     /* ========== CONSTRUCTOR ========== */
 
-    constructor(address _dataProvider, address _operator, address _asset, string memory _symbol) {
+    constructor(address _dataProvider, address _operator, string memory _symbol) {
         dataProvider = _dataProvider;
         operator = _operator;
-        asset = _asset;
         symbol = _symbol;
         createdOn = block.timestamp;
     }
@@ -192,6 +187,7 @@ contract CandlestickDataFeed is ICandlestickDataFeed {
     */
     function updateData(uint256 _high, uint256 _low, uint256 _open, uint256 _close, uint256 _volume, uint256 _startingTimestamp) external override onlyDataProvider notHalted {
         require(_startingTimestamp >= lastUpdated, "CandlestickDataFeed: Starting timestamp must be in the future.");
+        require(_startingTimestamp <= block.timestamp, "CandlestickDataFeed: Starting timestamp must be before current timestamp.");
         
         // Gas savings.
         uint256 index = numberOfUpdates.add(1);

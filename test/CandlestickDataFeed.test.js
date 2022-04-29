@@ -28,7 +28,7 @@ describe("CandlestickDataFeed", () => {
   });
 
   beforeEach(async () => {
-    dataFeed = await DataFeedFactory.deploy(otherUser.address, deployer.address, testTokenAddress, "TEST");
+    dataFeed = await DataFeedFactory.deploy(otherUser.address, deployer.address, "TEST");
     await dataFeed.deployed();
     dataFeedAddress = dataFeed.address;
   });

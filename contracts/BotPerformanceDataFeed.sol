@@ -52,10 +52,10 @@ contract BotPerformanceDataFeed is IBotPerformanceDataFeed {
     address public operator;
 
     // Stores usage fees.
-    IFeePool public immutable feePool;
+    IFeePool immutable feePool;
 
     // Used for getting the current price of an asset.
-    ICandlestickDataFeedRegistry public immutable candlestickDataFeedRegistry;
+    ICandlestickDataFeedRegistry immutable candlestickDataFeedRegistry;
 
     // Address of the data feed's trading bot.
     address public immutable tradingBot;
@@ -127,9 +127,9 @@ contract BotPerformanceDataFeed is IBotPerformanceDataFeed {
     /**
      * @notice Returns the order info at the given index.
      * @param _index Index of the order.
-     * @return (address, bool, uint256, uint256) Address of the asset, whether the order was a 'buy', timestamp, asset's price.
+     * @return (string, bool, uint256, uint256) Symbol of the asset, whether the order was a 'buy', timestamp, asset's price.
      */
-    function getOrderInfo(uint256 _index) external view override returns (address, bool, uint256, uint256) {
+    function getOrderInfo(uint256 _index) external view override returns (string memory, bool, uint256, uint256) {
         // Gas savings.
         Order memory order = orders[_index];
 
@@ -143,12 +143,12 @@ contract BotPerformanceDataFeed is IBotPerformanceDataFeed {
      * @dev This function is meant to be called by the dedicated data provider whenever the bot's keeper
      *          updates entry/exit rules with the latest asset price.
      * @dev Position size is not included because trading bots always use their max buying power for each trade.
-     * @param _asset Address of the asset.
+     * @param _asset Symbol of the asset.
      * @param _isBuy Whether the order is a 'buy' order
      * @param _price Price at which the order executed.
      * @param _timestamp Timestamp when the order was executed.
      */
-    function updateData(address _asset, bool _isBuy, uint256 _price, uint256 _timestamp) external override onlyDataProvider notHalted {
+    function updateData(string memory _asset, bool _isBuy, uint256 _price, uint256 _timestamp) external override onlyDataProvider notHalted {
         // Gas savings.
         uint256 index = numberOfUpdates.add(1);
         uint256 botPrice = _calculateTokenPrice();
@@ -219,8 +219,6 @@ contract BotPerformanceDataFeed is IBotPerformanceDataFeed {
     * @param _newProvider Address of the new data provider.
     */
     function updateDedicatedDataProvider(address _newProvider) external override onlyOperator {
-        require(_newProvider != address(0), "BotPerformanceDataFeed: Invalid address for _newProvider.");
-
         dataProvider = _newProvider;
 
         emit UpdatedDedicatedDataProvider(_newProvider);
@@ -232,8 +230,6 @@ contract BotPerformanceDataFeed is IBotPerformanceDataFeed {
     * @param _newOperator Address of the new operator.
     */
     function setOperator(address _newOperator) external override onlyOperator {
-        require(_newOperator != address(0), "BotPerformanceDataFeed: Invalid address for _newOperator.");
-
         operator = _newOperator;
 
         emit SetOperator(_newOperator);
@@ -294,7 +290,7 @@ contract BotPerformanceDataFeed is IBotPerformanceDataFeed {
 
     /* ========== EVENTS ========== */
 
-    event UpdatedData(uint256 index, address asset, bool isBuy, uint256 assetPrice, uint256 botPrice);
+    event UpdatedData(uint256 index, string asset, bool isBuy, uint256 assetPrice, uint256 botPrice);
     event UpdatedDedicatedDataProvider(address newProvider);
     event SetOperator(address newOperator);
     event HaltDataFeed(bool isHalted);

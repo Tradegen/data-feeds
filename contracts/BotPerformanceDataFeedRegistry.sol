@@ -100,16 +100,6 @@ contract BotPerformanceDataFeedRegistry is IBotPerformanceDataFeedRegistry, Owna
     }
 
     /**
-    * @notice Given the address of a trading bot, returns the address of the trading bot's data feed.
-    * @dev Returns address(0) if the given trading bot does not have a data feed.
-    * @param _tradingBot Address of the trading bot.
-    * @return address Address of the data feed.
-    */
-    function getDataFeedAddress(address _tradingBot) external view override returns (address) {
-        return dataFeeds[_tradingBot];
-    }
-
-    /**
     * @notice Returns the timestamp at which the given trading bot's data feed was last updated.
     * @dev Returns 0 if the given trading bot does not have a data feed.
     * @param _tradingBot Address of the trading bot.
@@ -150,12 +140,12 @@ contract BotPerformanceDataFeedRegistry is IBotPerformanceDataFeedRegistry, Owna
      * @dev Returns 0 for each value if the trading bot does not have a data feed or the given index is out of bounds.
      * @param _tradingBot Address of the trading bot.
      * @param _index Index of the order.
-     * @return (address, bool, uint256, uint256) Address of the asset, whether the order was a 'buy', timestamp, asset's price.
+     * @return (string, bool, uint256, uint256) Address of the asset, whether the order was a 'buy', timestamp, asset's price.
      */
-    function getOrderInfo(address _tradingBot, uint256 _index) external view override returns (address, bool, uint256, uint256) {
+    function getOrderInfo(address _tradingBot, uint256 _index) external view override returns (string memory, bool, uint256, uint256) {
         address dataFeed = dataFeeds[_tradingBot];
         if (dataFeed == address(0)) {
-            return (address(0), false, 0, 0);
+            return ("", false, 0, 0);
         }
 
         return IBotPerformanceDataFeed(dataFeed).getOrderInfo(_index);

@@ -140,7 +140,7 @@ describe("BotPerformanceDataFeedRegistry", () => {
         let operator = await botPerformanceDataFeedRegistry.operator();
         expect(operator).to.equal(otherUser.address);
 
-        botPerformanceDataFeedAddress = await botPerformanceDataFeedRegistry.getDataFeedAddress(tradingBotAddress);
+        botPerformanceDataFeedAddress = await botPerformanceDataFeedRegistry.dataFeeds(tradingBotAddress);
         botPerformanceDataFeed = BotPerformanceDataFeedFactory.attach(botPerformanceDataFeedAddress);
 
         let dataFeedOperator = await botPerformanceDataFeed.operator();
@@ -186,7 +186,7 @@ describe("BotPerformanceDataFeedRegistry", () => {
         let tx2 = botPerformanceDataFeedRegistry.connect(otherUser).updateDedicatedDataProvider(tradingBotAddress, otherUser.address);
         await expect(tx2).to.be.reverted;
 
-        botPerformanceDataFeedAddress = await botPerformanceDataFeedRegistry.getDataFeedAddress(tradingBotAddress);
+        botPerformanceDataFeedAddress = await botPerformanceDataFeedRegistry.dataFeeds(tradingBotAddress);
         botPerformanceDataFeed = BotPerformanceDataFeedFactory.attach(botPerformanceDataFeedAddress);
 
         let dataProvider = await botPerformanceDataFeed.dataProvider();
@@ -205,7 +205,7 @@ describe("BotPerformanceDataFeedRegistry", () => {
         let tx2 = await botPerformanceDataFeedRegistry.updateDedicatedDataProvider(tradingBotAddress, otherUser.address);
         await tx2.wait();
 
-        botPerformanceDataFeedAddress = await botPerformanceDataFeedRegistry.getDataFeedAddress(tradingBotAddress);
+        botPerformanceDataFeedAddress = await botPerformanceDataFeedRegistry.dataFeeds(tradingBotAddress);
         botPerformanceDataFeed = BotPerformanceDataFeedFactory.attach(botPerformanceDataFeedAddress);
 
         let dataProvider = await botPerformanceDataFeed.dataProvider();
@@ -221,7 +221,7 @@ describe("BotPerformanceDataFeedRegistry", () => {
         let tx2 = botPerformanceDataFeedRegistry.connect(otherUser).haltDataFeed(tradingBotAddress, true);
         await expect(tx2).to.be.reverted;
 
-        botPerformanceDataFeedAddress = await botPerformanceDataFeedRegistry.getDataFeedAddress(tradingBotAddress);
+        botPerformanceDataFeedAddress = await botPerformanceDataFeedRegistry.dataFeeds(tradingBotAddress);
         botPerformanceDataFeed = BotPerformanceDataFeedFactory.attach(botPerformanceDataFeedAddress);
 
         let isHalted = await botPerformanceDataFeed.isHalted();
@@ -240,7 +240,7 @@ describe("BotPerformanceDataFeedRegistry", () => {
         let tx2 = await botPerformanceDataFeedRegistry.haltDataFeed(tradingBotAddress, true);
         await tx2.wait();
 
-        botPerformanceDataFeedAddress = await botPerformanceDataFeedRegistry.getDataFeedAddress(tradingBotAddress);
+        botPerformanceDataFeedAddress = await botPerformanceDataFeedRegistry.dataFeeds(tradingBotAddress);
         botPerformanceDataFeed = BotPerformanceDataFeedFactory.attach(botPerformanceDataFeedAddress);
 
         let isHalted = await botPerformanceDataFeed.isHalted();
@@ -259,7 +259,7 @@ describe("BotPerformanceDataFeedRegistry", () => {
         let tx2 = botPerformanceDataFeedRegistry.connect(otherUser).setDataFeedOperator(tradingBotAddress, otherUser.address);
         await expect(tx2).to.be.reverted;
 
-        botPerformanceDataFeedAddress = await botPerformanceDataFeedRegistry.getDataFeedAddress(tradingBotAddress);
+        botPerformanceDataFeedAddress = await botPerformanceDataFeedRegistry.dataFeeds(tradingBotAddress);
         botPerformanceDataFeed = BotPerformanceDataFeedFactory.attach(botPerformanceDataFeedAddress);
 
         let operator = await botPerformanceDataFeed.operator();
@@ -278,7 +278,7 @@ describe("BotPerformanceDataFeedRegistry", () => {
         let tx2 = await botPerformanceDataFeedRegistry.setDataFeedOperator(tradingBotAddress, otherUser.address);
         await tx2.wait();
 
-        botPerformanceDataFeedAddress = await botPerformanceDataFeedRegistry.getDataFeedAddress(tradingBotAddress);
+        botPerformanceDataFeedAddress = await botPerformanceDataFeedRegistry.dataFeeds(tradingBotAddress);
         botPerformanceDataFeed = BotPerformanceDataFeedFactory.attach(botPerformanceDataFeedAddress);
 
         let operator = await botPerformanceDataFeed.operator();
@@ -302,7 +302,7 @@ describe("BotPerformanceDataFeedRegistry", () => {
         let tx3 = await botPerformanceDataFeedRegistry.getTokenPrice(tradingBotAddress);
         await tx3.wait();
 
-        botPerformanceDataFeedAddress = await botPerformanceDataFeedRegistry.getDataFeedAddress(tradingBotAddress);
+        botPerformanceDataFeedAddress = await botPerformanceDataFeedRegistry.dataFeeds(tradingBotAddress);
         botPerformanceDataFeed = BotPerformanceDataFeedFactory.attach(botPerformanceDataFeedAddress);
 
         let balanceDataFeedRegistry = await feeToken.balanceOf(botPerformanceDataFeedRegistryAddress);
@@ -321,11 +321,11 @@ describe("BotPerformanceDataFeedRegistry", () => {
         let tx = await botPerformanceDataFeedRegistry.registerDataFeed(tradingBotAddress, parseEther("1"), deployer.address);
         await tx.wait();
         
-        botPerformanceDataFeedAddress = await botPerformanceDataFeedRegistry.getDataFeedAddress(tradingBotAddress);
+        botPerformanceDataFeedAddress = await botPerformanceDataFeedRegistry.dataFeeds(tradingBotAddress);
         botPerformanceDataFeed = BotPerformanceDataFeedFactory.attach(botPerformanceDataFeedAddress);
         let currentTime = await mockBotPerformanceDataFeed.getCurrentTime();
 
-        let tx2 = await botPerformanceDataFeed.updateData(testTokenAddress, false, parseEther("1"), 1000);
+        let tx2 = await botPerformanceDataFeed.updateData("TEST", false, parseEther("1"), 1000);
         await tx2.wait();
 
         let usageFeeToken = await botPerformanceDataFeedRegistry.usageFeeToken(tradingBotAddress);
@@ -341,9 +341,6 @@ describe("BotPerformanceDataFeedRegistry", () => {
         expect(dataFeedInfo[3]).to.equal(deployer.address);
         expect(dataFeedInfo[4]).to.equal(parseEther("1"));
 
-        let queriedDataFeedAddress = await botPerformanceDataFeedRegistry.getDataFeedAddress(tradingBotAddress);
-        expect(queriedDataFeedAddress).to.equal(botPerformanceDataFeedAddress);
-
         let lastUpdated = await botPerformanceDataFeedRegistry.lastUpdated(tradingBotAddress);
         expect(lastUpdated).to.equal(Number(currentTime) + 1);
 
@@ -354,7 +351,7 @@ describe("BotPerformanceDataFeedRegistry", () => {
         expect(hasDataFeed).to.be.true;
 
         let orderInfo = await botPerformanceDataFeedRegistry.getOrderInfo(tradingBotAddress, 1);
-        expect(orderInfo[0]).to.equal(testTokenAddress);
+        expect(orderInfo[0]).to.equal("TEST");
         expect(orderInfo[1]).to.be.false;
         expect(orderInfo[2]).to.equal(1000);
         expect(orderInfo[3]).to.equal(parseEther("1"));

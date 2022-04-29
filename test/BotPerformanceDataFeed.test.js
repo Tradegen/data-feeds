@@ -183,7 +183,7 @@ describe("BotPerformanceDataFeedRegistry", () => {
         let tx = await botPerformanceDataFeed.setNumberOfUpdates(1);
         await tx.wait();
 
-        let tx2 = await botPerformanceDataFeed.setOrder(1, testTokenAddress, false, 1000, parseEther("1"), parseEther("2"));
+        let tx2 = await botPerformanceDataFeed.setOrder(1, "TEST", false, 1000, parseEther("1"), parseEther("2"));
         await tx2.wait();
 
         let price = await botPerformanceDataFeed.calculateTokenPrice();
@@ -194,17 +194,17 @@ describe("BotPerformanceDataFeedRegistry", () => {
         let tx = await botPerformanceDataFeed.setNumberOfUpdates(1);
         await tx.wait();
 
-        let tx2 = await candlestickDataFeedRegistry.registerDataFeed(testTokenAddress, "TEST", deployer.address);
+        let tx2 = await candlestickDataFeedRegistry.registerDataFeed("TEST", deployer.address);
         await tx2.wait();
 
-        candlestickDataFeedAddress = await candlestickDataFeedRegistry.getDataFeedAddress(testTokenAddress);
+        candlestickDataFeedAddress = await candlestickDataFeedRegistry.getDataFeedAddress("TEST");
         candlestickDataFeed = CandlestickDataFeedFactory.attach(candlestickDataFeedAddress);
         let currentTime = await botPerformanceDataFeed.getCurrentTime();
 
         let tx3 = await candlestickDataFeed.updateData(parseEther("1.1"), parseEther("0.9"), parseEther("1"), parseEther("1.1"), parseEther("10"), Number(currentTime) + 10);
         await tx3.wait();
 
-        let tx4 = await botPerformanceDataFeed.setOrder(1, testTokenAddress, true, 1000, parseEther("1"), parseEther("1"));
+        let tx4 = await botPerformanceDataFeed.setOrder(1, "TEST", true, 1000, parseEther("1"), parseEther("1"));
         await tx4.wait();
 
         let price = await botPerformanceDataFeed.calculateTokenPrice();
@@ -215,17 +215,17 @@ describe("BotPerformanceDataFeedRegistry", () => {
         let tx = await botPerformanceDataFeed.setNumberOfUpdates(1);
         await tx.wait();
 
-        let tx2 = await candlestickDataFeedRegistry.registerDataFeed(testTokenAddress, "TEST", deployer.address);
+        let tx2 = await candlestickDataFeedRegistry.registerDataFeed("TEST", deployer.address);
         await tx2.wait();
 
-        candlestickDataFeedAddress = await candlestickDataFeedRegistry.getDataFeedAddress(testTokenAddress);
+        candlestickDataFeedAddress = await candlestickDataFeedRegistry.getDataFeedAddress("TEST");
         candlestickDataFeed = CandlestickDataFeedFactory.attach(candlestickDataFeedAddress);
         let currentTime = await botPerformanceDataFeed.getCurrentTime();
 
         let tx3 = await candlestickDataFeed.updateData(parseEther("1.1"), parseEther("0.9"), parseEther("1"), parseEther("0.9"), parseEther("10"), Number(currentTime) + 10);
         await tx3.wait();
 
-        let tx4 = await botPerformanceDataFeed.setOrder(1, testTokenAddress, true, 1000, parseEther("1.8"), parseEther("1"));
+        let tx4 = await botPerformanceDataFeed.setOrder(1, "TEST", true, 1000, parseEther("1.8"), parseEther("1"));
         await tx4.wait();
 
         let price = await botPerformanceDataFeed.calculateTokenPrice();
@@ -255,7 +255,7 @@ describe("BotPerformanceDataFeedRegistry", () => {
 
   describe("#updateData", () => {
     it("onlyDataProvider", async () => {
-      let tx = botPerformanceDataFeed.connect(otherUser).updateData(testTokenAddress, true, parseEther("1"), 1000);
+      let tx = botPerformanceDataFeed.connect(otherUser).updateData("TEST", true, parseEther("1"), 1000);
       await expect(tx).to.be.reverted;
 
       let numberOfUpdates = await botPerformanceDataFeed.numberOfUpdates();
@@ -266,7 +266,7 @@ describe("BotPerformanceDataFeedRegistry", () => {
         let tx = await botPerformanceDataFeed.haltDataFeed(true);
         await tx.wait();
 
-        let tx2 = botPerformanceDataFeed.updateData(testTokenAddress, true, parseEther("1"), 1000);
+        let tx2 = botPerformanceDataFeed.updateData("TEST", true, parseEther("1"), 1000);
         await expect(tx2).to.be.reverted;
 
         let numberOfUpdates = await botPerformanceDataFeed.numberOfUpdates();
@@ -276,7 +276,7 @@ describe("BotPerformanceDataFeedRegistry", () => {
     it("meets requirements", async () => {
         let currentTime = await botPerformanceDataFeed.getCurrentTime();
 
-        let tx = await botPerformanceDataFeed.updateData(testTokenAddress, true, parseEther("1"), 1000);
+        let tx = await botPerformanceDataFeed.updateData("TEST", true, parseEther("1"), 1000);
         await tx.wait();
   
         let numberOfUpdates = await botPerformanceDataFeed.numberOfUpdates();
@@ -289,7 +289,7 @@ describe("BotPerformanceDataFeedRegistry", () => {
         expect(indexTimestamp).to.equal(Number(currentTime) + 1);
 
         let orderInfo = await botPerformanceDataFeed.getOrderInfo(1);
-        expect(orderInfo[0]).to.equal(testTokenAddress);
+        expect(orderInfo[0]).to.equal("TEST");
         expect(orderInfo[1]).to.be.true;
         expect(orderInfo[2]).to.equal(1000);
         expect(orderInfo[3]).to.equal(parseEther("1"));

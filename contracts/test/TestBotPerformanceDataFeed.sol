@@ -21,7 +21,7 @@ contract TestBotPerformanceDataFeed is BotPerformanceDataFeed {
         return _calculateTokenPrice();
     }
 
-    function setOrder(uint256 _index, address _asset, bool _isBuy, uint256 _timestamp, uint256 _assetPrice, uint256 _botPrice) external {
+    function setOrder(uint256 _index, string memory _asset, bool _isBuy, uint256 _timestamp, uint256 _assetPrice, uint256 _botPrice) external {
         orders[_index] = Order({
             asset: _asset,
             isBuy: _isBuy,

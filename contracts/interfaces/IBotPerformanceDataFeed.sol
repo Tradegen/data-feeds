@@ -4,7 +4,7 @@ pragma solidity >=0.7.6;
 
 interface IBotPerformanceDataFeed {
     struct Order {
-        address asset;
+        string asset;
         bool isBuy;
         uint256 timestamp;
         uint256 assetPrice;
@@ -64,12 +64,12 @@ interface IBotPerformanceDataFeed {
      * @dev This function is meant to be called by the dedicated data provider whenever the bot's keeper
      *          updates entry/exit rules with the latest asset price.
      * @dev Position size is not included because trading bots always use their max buying power for each trade.
-     * @param _asset Address of the asset.
+     * @param _asset Symbol of the asset.
      * @param _isBuy Whether the order is a 'buy' order
      * @param _price Price at which the order executed.
       * @param _timestamp Timestamp when the order was executed.
      */
-    function updateData(address _asset, bool _isBuy, uint256 _price, uint256 _timestamp) external;
+    function updateData(string memory _asset, bool _isBuy, uint256 _price, uint256 _timestamp) external;
 
     /**
     * @notice Updates the address of the data provider allowed to update this data feed.
@@ -81,9 +81,9 @@ interface IBotPerformanceDataFeed {
     /**
      * @notice Returns the order info at the given index.
      * @param _index Index of the order.
-     * @return (address, bool, uint256, uint256) Address of the asset, whether the order was a 'buy', timestamp, asset's price.
+     * @return (address, bool, uint256, uint256) Symbol of the asset, whether the order was a 'buy', timestamp, asset's price.
      */
-    function getOrderInfo(uint256 _index) external view returns (address, bool, uint256, uint256);
+    function getOrderInfo(uint256 _index) external view returns (string memory, bool, uint256, uint256);
 
     /**
      * @notice Returns the current token price of the trading bot.
