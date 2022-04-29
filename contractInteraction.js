@@ -57,19 +57,39 @@ async function getDataFeedProvider(dataFeedAddress) {
   console.log(provider);
 }
 
+async function getCurrentCandlestick(useTestnet, asset) {
+  const signers = await ethers.getSigners();
+  deployer = signers[0];
+  
+  let address = useTestnet ? CANDLESTICK_DATA_FEED_REGISTRY_ADDRESS_TESTNET : CANDLESTICK_DATA_FEED_REGISTRY_ADDRESS_MAINNET;
+  let CandlestickDataFeedRegistryFactory = await ethers.getContractFactory('CandlestickDataFeedRegistry');
+  let candlestickDataFeedRegistry = CandlestickDataFeedRegistryFactory.attach(address);
+
+  let info = await candlestickDataFeedRegistry.getCurrentCandlestick(asset);
+  console.log(info);
+}
+
+/*
 registerCandlestickDataFeed(true, "BTC", "0xd0B64C57c4D5AD7a404b057B160e41bfA853dbac")
   .then(() => process.exit(0))
   .catch(error => {
     console.error(error)
     process.exit(1)
   })
-/*
+
 getDataFeedInfo(true, "BTC")
   .then(() => process.exit(0))
   .catch(error => {
     console.error(error)
     process.exit(1)
   })*/
+
+  getCurrentCandlestick(true, "BTC")
+  .then(() => process.exit(0))
+  .catch(error => {
+    console.error(error)
+    process.exit(1)
+  })
 /*
 getDataFeedProvider("0xC9939E49a47B76fe7632Ede3155414c56DEEa7C2")
   .then(() => process.exit(0))
