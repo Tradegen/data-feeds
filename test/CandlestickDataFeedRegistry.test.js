@@ -259,13 +259,13 @@ describe("CandlestickDataFeedRegistry", () => {
         dataFeed = DataFeedFactory.attach(dataFeedAddress);
         let currentTime = await mockDataFeed.getCurrentTime();
 
-        let tx2 = await dataFeed.updateData(parseEther("1.1"), parseEther("0.9"), parseEther("1"), parseEther("1.05"), parseEther("10"), Number(currentTime) + 10);
+        let tx2 = await dataFeed.updateData(parseEther("1.1"), parseEther("0.9"), parseEther("1"), parseEther("1.05"), parseEther("10"), Number(currentTime) - 10);
         await tx2.wait();
 
-        let tx3 = await dataFeed.updateData(parseEther("1.2"), parseEther("1"), parseEther("1.05"), parseEther("1.15"), parseEther("20"), Number(currentTime) + 70);
+        let tx3 = await dataFeed.updateData(parseEther("1.2"), parseEther("1"), parseEther("1.05"), parseEther("1.15"), parseEther("20"), Number(currentTime) - 7);
         await tx3.wait();
 
-        let tx4 = await dataFeed.updateData(parseEther("1.15"), parseEther("0.7"), parseEther("1.15"), parseEther("0.75"), parseEther("50"), Number(currentTime) + 80);
+        let tx4 = await dataFeed.updateData(parseEther("1.15"), parseEther("0.7"), parseEther("1.15"), parseEther("0.75"), parseEther("50"), Number(currentTime) - 5);
         await tx4.wait();
 
         let currentPrice = await registry.getCurrentPrice("TEST");
@@ -287,7 +287,7 @@ describe("CandlestickDataFeedRegistry", () => {
         expect(currentCandlestick[3]).to.equal(parseEther("1.15"));
         expect(currentCandlestick[4]).to.equal(parseEther("0.75"));
         expect(currentCandlestick[5]).to.equal(parseEther("50"));
-        expect(currentCandlestick[6]).to.equal(Number(currentTime) + 80);
+        expect(currentCandlestick[6]).to.equal(Number(currentTime) - 5);
 
         let previousCandlestick = await registry.getCandlestickAt("TEST", 2);
         expect(previousCandlestick[0]).to.equal(2);
@@ -296,7 +296,7 @@ describe("CandlestickDataFeedRegistry", () => {
         expect(previousCandlestick[3]).to.equal(parseEther("1.05"));
         expect(previousCandlestick[4]).to.equal(parseEther("1.15"));
         expect(previousCandlestick[5]).to.equal(parseEther("20"));
-        expect(previousCandlestick[6]).to.equal(Number(currentTime) + 70);
+        expect(previousCandlestick[6]).to.equal(Number(currentTime) - 7);
 
         let dataFeedInfo = await registry.getDataFeedInfo("TEST");
         expect(dataFeedInfo[0]).to.equal(dataFeedAddress);
@@ -309,7 +309,7 @@ describe("CandlestickDataFeedRegistry", () => {
         expect(queriedDataFeedAddress).to.equal(dataFeedAddress);
 
         let lastUpdated = await registry.lastUpdated("TEST");
-        expect(lastUpdated).to.equal(Number(currentTime) + 3);
+        expect(lastUpdated).to.equal(Number(currentTime) - 5);
 
         let status = await registry.getDataFeedStatus("TEST");
         expect(status).to.equal(0);
@@ -323,7 +323,7 @@ describe("CandlestickDataFeedRegistry", () => {
         expect(aggregatedCandlestick[2]).to.equal(parseEther("1"));
         expect(aggregatedCandlestick[3]).to.equal(parseEther("0.75"));
         expect(aggregatedCandlestick[4]).to.equal(parseEther("80"));
-        expect(aggregatedCandlestick[5]).to.equal(Number(currentTime) + 10);
+        expect(aggregatedCandlestick[5]).to.equal(Number(currentTime) - 10);
     });
   });
 });

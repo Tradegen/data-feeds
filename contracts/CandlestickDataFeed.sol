@@ -14,7 +14,7 @@ contract CandlestickDataFeed is ICandlestickDataFeed {
     /* ========== CONSTANTS ========== */
 
     // Maximum number of seconds between data feed updates before the data feed is considered outdated.
-    uint256 public constant MAX_TIME_BETWEEN_UPDATES = 60;
+    uint256 public constant MAX_TIME_BETWEEN_UPDATES = 180;
 
     // Maximum timeframe of 60 minutes (1 hour).
     uint256 public constant MAX_CANDLESTICKS_TO_AGGREGATE = 60;
@@ -186,15 +186,15 @@ contract CandlestickDataFeed is ICandlestickDataFeed {
     * @param _startingTimestamp Timestamp at the start of the candlestick.
     */
     function updateData(uint256 _high, uint256 _low, uint256 _open, uint256 _close, uint256 _volume, uint256 _startingTimestamp) external override onlyDataProvider notHalted {
-        require(_startingTimestamp >= lastUpdated, "CandlestickDataFeed: Starting timestamp must be in the future.");
+        require(_startingTimestamp > lastUpdated, "CandlestickDataFeed: Starting timestamp must be in the future.");
         require(_startingTimestamp <= block.timestamp, "CandlestickDataFeed: Starting timestamp must be before current timestamp.");
         
         // Gas savings.
         uint256 index = numberOfUpdates.add(1);
 
         numberOfUpdates = index;
-        indexTimestamps[index] = block.timestamp;
-        lastUpdated = block.timestamp;
+        indexTimestamps[index] = _startingTimestamp;
+        lastUpdated = _startingTimestamp;
 
         candlesticks[index] = Candlestick({
             index: index,

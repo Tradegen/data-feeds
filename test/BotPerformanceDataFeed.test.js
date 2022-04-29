@@ -201,7 +201,7 @@ describe("BotPerformanceDataFeedRegistry", () => {
         candlestickDataFeed = CandlestickDataFeedFactory.attach(candlestickDataFeedAddress);
         let currentTime = await botPerformanceDataFeed.getCurrentTime();
 
-        let tx3 = await candlestickDataFeed.updateData(parseEther("1.1"), parseEther("0.9"), parseEther("1"), parseEther("1.1"), parseEther("10"), Number(currentTime) + 10);
+        let tx3 = await candlestickDataFeed.updateData(parseEther("1.1"), parseEther("0.9"), parseEther("1"), parseEther("1.1"), parseEther("10"), Number(currentTime) - 10);
         await tx3.wait();
 
         let tx4 = await botPerformanceDataFeed.setOrder(1, "TEST", true, 1000, parseEther("1"), parseEther("1"));
@@ -222,7 +222,7 @@ describe("BotPerformanceDataFeedRegistry", () => {
         candlestickDataFeed = CandlestickDataFeedFactory.attach(candlestickDataFeedAddress);
         let currentTime = await botPerformanceDataFeed.getCurrentTime();
 
-        let tx3 = await candlestickDataFeed.updateData(parseEther("1.1"), parseEther("0.9"), parseEther("1"), parseEther("0.9"), parseEther("10"), Number(currentTime) + 10);
+        let tx3 = await candlestickDataFeed.updateData(parseEther("1.1"), parseEther("0.9"), parseEther("1"), parseEther("0.9"), parseEther("10"), Number(currentTime) - 10);
         await tx3.wait();
 
         let tx4 = await botPerformanceDataFeed.setOrder(1, "TEST", true, 1000, parseEther("1.8"), parseEther("1"));
