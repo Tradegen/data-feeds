@@ -8,6 +8,19 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timeframe",
+        "type": "uint256"
+      }
+    ],
+    "name": "AddedTimeframe",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": true,
         "internalType": "address",
         "name": "previousOwner",
@@ -31,6 +44,12 @@
         "internalType": "string",
         "name": "asset",
         "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timeframe",
+        "type": "uint256"
       },
       {
         "indexed": false,
@@ -77,9 +96,33 @@
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "availableTimeframes",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "string",
         "name": "",
         "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "name": "dataFeeds",
@@ -104,9 +147,9 @@
     "name": "indexes",
     "outputs": [
       {
-        "internalType": "string",
+        "internalType": "address",
         "name": "",
-        "type": "string"
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -187,9 +230,46 @@
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "validTimeframes",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getValidTimeframes",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "string",
         "name": "_asset",
         "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_timeframe",
+        "type": "uint256"
       }
     ],
     "name": "getCurrentPrice",
@@ -209,6 +289,11 @@
         "internalType": "string",
         "name": "_asset",
         "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_timeframe",
+        "type": "uint256"
       },
       {
         "internalType": "uint256",
@@ -233,6 +318,11 @@
         "internalType": "string",
         "name": "_asset",
         "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_timeframe",
+        "type": "uint256"
       }
     ],
     "name": "getCurrentCandlestick",
@@ -282,6 +372,11 @@
         "internalType": "string",
         "name": "_asset",
         "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_timeframe",
+        "type": "uint256"
       },
       {
         "internalType": "uint256",
@@ -336,6 +431,11 @@
         "internalType": "string",
         "name": "_asset",
         "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_timeframe",
+        "type": "uint256"
       }
     ],
     "name": "getDataFeedInfo",
@@ -375,6 +475,11 @@
         "internalType": "string",
         "name": "_asset",
         "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_timeframe",
+        "type": "uint256"
       }
     ],
     "name": "getDataFeedAddress",
@@ -394,6 +499,11 @@
         "internalType": "string",
         "name": "_asset",
         "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_timeframe",
+        "type": "uint256"
       }
     ],
     "name": "lastUpdated",
@@ -413,6 +523,11 @@
         "internalType": "string",
         "name": "_asset",
         "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_timeframe",
+        "type": "uint256"
       }
     ],
     "name": "getDataFeedStatus",
@@ -432,6 +547,11 @@
         "internalType": "string",
         "name": "_asset",
         "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_timeframe",
+        "type": "uint256"
       },
       {
         "internalType": "uint256",
@@ -481,6 +601,11 @@
         "internalType": "string",
         "name": "_asset",
         "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_timeframe",
+        "type": "uint256"
       }
     ],
     "name": "hasDataFeed",
@@ -500,6 +625,35 @@
         "internalType": "string",
         "name": "_asset",
         "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_timeframe",
+        "type": "uint256"
+      }
+    ],
+    "name": "canUpdate",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_asset",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_timeframe",
+        "type": "uint256"
       },
       {
         "internalType": "address",
@@ -546,6 +700,11 @@
         "type": "string"
       },
       {
+        "internalType": "uint256",
+        "name": "_timeframe",
+        "type": "uint256"
+      },
+      {
         "internalType": "address",
         "name": "_newOperator",
         "type": "address"
@@ -562,6 +721,11 @@
         "internalType": "string",
         "name": "_asset",
         "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_timeframe",
+        "type": "uint256"
       },
       {
         "internalType": "address",
@@ -582,12 +746,30 @@
         "type": "string"
       },
       {
+        "internalType": "uint256",
+        "name": "_timeframe",
+        "type": "uint256"
+      },
+      {
         "internalType": "bool",
         "name": "_isHalted",
         "type": "bool"
       }
     ],
     "name": "haltDataFeed",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_timeframe",
+        "type": "uint256"
+      }
+    ],
+    "name": "addValidTimeframe",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
