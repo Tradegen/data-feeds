@@ -1,6 +1,6 @@
 const { expect } = require("chai");
 const { parseEther } = require("@ethersproject/units");
-/*
+
 describe("CandlestickDataFeed", () => {
   let deployer;
   let otherUser;
@@ -182,7 +182,7 @@ describe("CandlestickDataFeed", () => {
         expect(numberOfUpdates).to.equal(1);
   
         let lastUpdated = await dataFeed.lastUpdated();
-        expect(lastUpdated).to.equal(Number(currentTime) + 1);
+        expect(lastUpdated).to.equal(Number(currentTime));
 
         let indexTimestamp = await dataFeed.getIndexTimestamp(1);
         expect(indexTimestamp).to.equal(Number(currentTime));
@@ -223,17 +223,14 @@ describe("CandlestickDataFeed", () => {
         let tx = await dataFeed.connect(otherUser).updateData(parseEther("1.1"), parseEther("0.9"), parseEther("1"), parseEther("1.05"), parseEther("10"), Number(currentTime) - 100);
         await tx.wait();
 
-        let tx2 = await dataFeed.setLastUpdated(Number(currentTime) - 70);
-        await tx2.wait();
-
-        let tx3 = dataFeed.connect(otherUser).updateData(parseEther("1.1"), parseEther("0.9"), parseEther("1"), parseEther("1.05"), parseEther("10"), Number(currentTime) + 10);
-        await expect(tx3).to.be.reverted;
+        let tx2 = dataFeed.connect(otherUser).updateData(parseEther("1.1"), parseEther("0.9"), parseEther("1"), parseEther("1.05"), parseEther("10"), Number(currentTime) + 10);
+        await expect(tx2).to.be.reverted;
   
         let numberOfUpdates = await dataFeed.numberOfUpdates();
         expect(numberOfUpdates).to.equal(1);
   
         let lastUpdated = await dataFeed.lastUpdated();
-        expect(lastUpdated).to.equal(Number(currentTime) - 70);
+        expect(lastUpdated).to.equal(Number(currentTime) - 100);
 
         let indexTimestamp = await dataFeed.getIndexTimestamp(1);
         expect(indexTimestamp).to.equal(Number(currentTime) - 100);
@@ -271,7 +268,7 @@ describe("CandlestickDataFeed", () => {
     it("not enough time between updates", async () => {
       let currentTime = await dataFeed.getCurrentTime();
 
-      let tx = await dataFeed.connect(otherUser).updateData(parseEther("1.1"), parseEther("0.9"), parseEther("1"), parseEther("1.05"), parseEther("10"), Number(currentTime) - 100);
+      let tx = await dataFeed.connect(otherUser).updateData(parseEther("1.1"), parseEther("0.9"), parseEther("1"), parseEther("1.05"), parseEther("10"), Number(currentTime) - 50);
       await tx.wait();
 
       let tx2 = dataFeed.connect(otherUser).updateData(parseEther("1.1"), parseEther("0.9"), parseEther("1"), parseEther("1.05"), parseEther("10"), Number(currentTime) - 10);
@@ -281,10 +278,10 @@ describe("CandlestickDataFeed", () => {
       expect(numberOfUpdates).to.equal(1);
 
       let lastUpdated = await dataFeed.lastUpdated();
-      expect(lastUpdated).to.equal(Number(currentTime) + 1);
+      expect(lastUpdated).to.equal(Number(currentTime) - 50);
 
       let indexTimestamp = await dataFeed.getIndexTimestamp(1);
-      expect(indexTimestamp).to.equal(Number(currentTime) - 100);
+      expect(indexTimestamp).to.equal(Number(currentTime) - 50);
 
       let currentPrice = await dataFeed.getCurrentPrice();
       expect(currentPrice).to.equal(parseEther("1.05"));
@@ -303,7 +300,7 @@ describe("CandlestickDataFeed", () => {
       expect(currentCandlestick[3]).to.equal(parseEther("1"));
       expect(currentCandlestick[4]).to.equal(parseEther("1.05"));
       expect(currentCandlestick[5]).to.equal(parseEther("10"));
-      expect(currentCandlestick[6]).to.equal(Number(currentTime) - 100);
+      expect(currentCandlestick[6]).to.equal(Number(currentTime) - 50);
 
       // Out of bounds.
       let invalidCandlestick = await dataFeed.getCandlestickAt(2);
@@ -332,7 +329,7 @@ describe("CandlestickDataFeed", () => {
         expect(numberOfUpdates).to.equal(2);
   
         let lastUpdated = await dataFeed.lastUpdated();
-        expect(lastUpdated).to.equal(Number(currentTime) + 3);
+        expect(lastUpdated).to.equal(Number(currentTime) - 7);
 
         let indexTimestamp1 = await dataFeed.getIndexTimestamp(1);
         expect(indexTimestamp1).to.equal(Number(currentTime) - 10);
@@ -482,4 +479,4 @@ describe("CandlestickDataFeed", () => {
         expect(aggregatedCandlestick[5]).to.equal(Number(currentTime) - 80);
     });
   });
-});*/
+});

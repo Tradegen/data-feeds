@@ -1,6 +1,6 @@
 const { expect } = require("chai");
 const { parseEther } = require("@ethersproject/units");
-/*
+
 describe("CandlestickDataFeedRegistry", () => {
   let deployer;
   let otherUser;
@@ -365,7 +365,7 @@ describe("CandlestickDataFeedRegistry", () => {
         expect(queriedDataFeedAddress).to.equal(dataFeedAddress);
 
         let lastUpdated = await registry.lastUpdated("TEST", 1);
-        expect(lastUpdated).to.equal(Number(currentTime) + 1);
+        expect(lastUpdated).to.equal(Number(currentTime) - 10);
 
         let status = await registry.getDataFeedStatus("TEST", 1);
         expect(status).to.equal(0);
@@ -377,4 +377,4 @@ describe("CandlestickDataFeedRegistry", () => {
         expect(canUpdate).to.be.false;
     });
   });
-});*/
+});

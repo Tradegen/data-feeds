@@ -207,7 +207,7 @@ contract CandlestickDataFeed is ICandlestickDataFeed {
 
         numberOfUpdates = index;
         indexTimestamps[index] = _startingTimestamp;
-        lastUpdated = block.timestamp;
+        lastUpdated = _startingTimestamp;
 
         candlesticks[index] = Candlestick({
             index: index,
