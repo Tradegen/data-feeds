@@ -1,3 +1,3 @@
-CandlestickDataFeedRegistry: 0x92AB4188FEFA45520DE79215e9Bc106D41a1Db54
+CandlestickDataFeedRegistry: 0xF493F7E4f12f8B24080750D1840B270609aA4757
 FeePool:
 BotPerformanceDataFeedRegistry:

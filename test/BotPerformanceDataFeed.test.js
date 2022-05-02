@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 const { parseEther } = require("@ethersproject/units");
 
-describe("BotPerformanceDataFeedRegistry", () => {
+describe("BotPerformanceDataFeed", () => {
   let deployer;
   let otherUser;
 
@@ -30,7 +30,7 @@ describe("BotPerformanceDataFeedRegistry", () => {
   let botPerformanceDataFeed;
   let botPerformanceDataFeedAddress;
   let BotPerformanceDataFeedFactory;
-
+  
   before(async () => {
     const signers = await ethers.getSigners();
 
@@ -194,10 +194,10 @@ describe("BotPerformanceDataFeedRegistry", () => {
         let tx = await botPerformanceDataFeed.setNumberOfUpdates(1);
         await tx.wait();
 
-        let tx2 = await candlestickDataFeedRegistry.registerDataFeed("TEST", deployer.address);
+        let tx2 = await candlestickDataFeedRegistry.registerDataFeed("TEST", 1, deployer.address);
         await tx2.wait();
 
-        candlestickDataFeedAddress = await candlestickDataFeedRegistry.getDataFeedAddress("TEST");
+        candlestickDataFeedAddress = await candlestickDataFeedRegistry.getDataFeedAddress("TEST", 1);
         candlestickDataFeed = CandlestickDataFeedFactory.attach(candlestickDataFeedAddress);
         let currentTime = await botPerformanceDataFeed.getCurrentTime();
 
@@ -215,10 +215,10 @@ describe("BotPerformanceDataFeedRegistry", () => {
         let tx = await botPerformanceDataFeed.setNumberOfUpdates(1);
         await tx.wait();
 
-        let tx2 = await candlestickDataFeedRegistry.registerDataFeed("TEST", deployer.address);
+        let tx2 = await candlestickDataFeedRegistry.registerDataFeed("TEST", 1, deployer.address);
         await tx2.wait();
 
-        candlestickDataFeedAddress = await candlestickDataFeedRegistry.getDataFeedAddress("TEST");
+        candlestickDataFeedAddress = await candlestickDataFeedRegistry.getDataFeedAddress("TEST", 1);
         candlestickDataFeed = CandlestickDataFeedFactory.attach(candlestickDataFeedAddress);
         let currentTime = await botPerformanceDataFeed.getCurrentTime();
 

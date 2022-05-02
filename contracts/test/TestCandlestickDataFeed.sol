@@ -6,7 +6,7 @@ pragma solidity ^0.8.3;
 import '../CandlestickDataFeed.sol';
 
 contract TestCandlestickDataFeed is CandlestickDataFeed {
-    constructor(address _dataProvider, address _operator, string memory _symbol) CandlestickDataFeed(_dataProvider, _operator, _symbol) {}
+    constructor(uint256 _timeframe, address _dataProvider, address _operator, string memory _symbol) CandlestickDataFeed(_timeframe, _dataProvider, _operator, _symbol) {}
 
     function setLastUpdated(uint256 _lastUpdated) external  {
         lastUpdated = _lastUpdated;

@@ -14,6 +14,18 @@ interface ICandlestickDataFeed {
     }
 
     /**
+    * @notice Returns the number of minutes each candlestick represents.
+    */
+    function timeframe() external view returns (uint256);
+
+    /**
+    * @notice Returns true if the data feed is ready to be updated.
+    * @dev Data feed can be updated if ((timeframe * 60) - 2) seconds have
+    *      elapsed since the last update.
+    */
+    function canUpdate() external view returns (bool);
+
+    /**
     * @notice Gets the current price of the data feed's asset.
     * @dev Current price is the 'close' price of the latest candlestick.
     * @dev Price is denominated in USD.

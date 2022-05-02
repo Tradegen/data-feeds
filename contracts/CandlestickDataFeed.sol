@@ -16,10 +16,13 @@ contract CandlestickDataFeed is ICandlestickDataFeed {
     // Maximum number of seconds between data feed updates before the data feed is considered outdated.
     uint256 public constant MAX_TIME_BETWEEN_UPDATES = 180;
 
-    // Maximum timeframe of 60 minutes (1 hour).
-    uint256 public constant MAX_CANDLESTICKS_TO_AGGREGATE = 60;
+    // Maximum number of candlesticks to aggregate.
+    uint256 public constant MAX_CANDLESTICKS_TO_AGGREGATE = 15;
 
     /* ========== STATE VARIABLES ========== */
+
+    // Number of minutes each candlestick represents.
+    uint256 public immutable override timeframe;
 
     // Timestamp at which this data feed was created.
     uint256 public override createdOn;
@@ -53,7 +56,8 @@ contract CandlestickDataFeed is ICandlestickDataFeed {
 
     /* ========== CONSTRUCTOR ========== */
 
-    constructor(address _dataProvider, address _operator, string memory _symbol) {
+    constructor(uint256 _timeframe, address _dataProvider, address _operator, string memory _symbol) {
+        timeframe = _timeframe;
         dataProvider = _dataProvider;
         operator = _operator;
         symbol = _symbol;
@@ -61,6 +65,15 @@ contract CandlestickDataFeed is ICandlestickDataFeed {
     }
 
     /* ========== VIEWS ========== */
+
+    /**
+    * @notice Returns true if the data feed is ready to be updated.
+    * @dev Data feed can be updated if ((timeframe * 60) - 2) seconds have
+    *      elapsed since the last update.
+    */
+    function canUpdate() public view override returns (bool) {
+        return block.timestamp >= lastUpdated.add(timeframe.mul(60)).sub(2);
+    }
 
     /**
     * @notice Gets the current price of the data feed's asset.
@@ -142,14 +155,14 @@ contract CandlestickDataFeed is ICandlestickDataFeed {
     /**
     * @notice Aggregates the given number of candlesticks into one candlestick, representing a higher timeframe.
     * @dev If there are not enough candlesticks in the data feed's history, the function will aggregate all candlesticks in the data feed's history.
-    *      Ex) If user wants to aggregate 60 candlesticks but the data feed only has 50 candlesticks, the function will return a candlestick of size 50 instead of 60.
-    * @dev It is not recommended to aggregate more than 10 candlesticks due to gas.
+    *      Ex) If user wants to aggregate 15 candlesticks but the data feed only has 10 candlesticks, the function will return a candlestick of size 10 instead of 15.
+    * @dev It is not recommended to aggregate more than 10 candlesticks due to gas fees.
     * @param _numberOfCandlesticks Number of candlesticks to aggregate.
     * @return (uint256, uint256, uint256, uint256, uint256, uint256) High price, low price, open price, close price, total volume, and starting timestamp.
     */
     function aggregateCandlesticks(uint256 _numberOfCandlesticks) external view override returns (uint256, uint256, uint256, uint256, uint256, uint256) {
         require(_numberOfCandlesticks > 1, "CandlestickDataFeed: Number of candlesticks must be greater than 1.");
-        require(_numberOfCandlesticks <= MAX_CANDLESTICKS_TO_AGGREGATE, "CandlestickDataFeed: Number of candlesticks cannot be greater than 60.");
+        require(_numberOfCandlesticks <= MAX_CANDLESTICKS_TO_AGGREGATE, "CandlestickDataFeed: Number of candlesticks cannot be greater than 15.");
 
         // Gas savings.
         uint256 endingIndex = numberOfUpdates;
@@ -186,7 +199,7 @@ contract CandlestickDataFeed is ICandlestickDataFeed {
     * @param _startingTimestamp Timestamp at the start of the candlestick.
     */
     function updateData(uint256 _high, uint256 _low, uint256 _open, uint256 _close, uint256 _volume, uint256 _startingTimestamp) external override onlyDataProvider notHalted {
-        require(_startingTimestamp > lastUpdated, "CandlestickDataFeed: Starting timestamp must be in the future.");
+        require(canUpdate(), "CandlestickDataFeed: Data feed is not ready to be updated.");
         require(_startingTimestamp <= block.timestamp, "CandlestickDataFeed: Starting timestamp must be before current timestamp.");
         
         // Gas savings.
@@ -194,7 +207,7 @@ contract CandlestickDataFeed is ICandlestickDataFeed {
 
         numberOfUpdates = index;
         indexTimestamps[index] = _startingTimestamp;
-        lastUpdated = _startingTimestamp;
+        lastUpdated = block.timestamp;
 
         candlesticks[index] = Candlestick({
             index: index,

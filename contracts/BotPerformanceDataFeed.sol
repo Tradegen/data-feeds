@@ -208,7 +208,7 @@ contract BotPerformanceDataFeed is IBotPerformanceDataFeed {
         // Gas savings.
         Order memory latestOrder = orders[numberOfUpdates];
 
-        return (latestOrder.isBuy) ? candlestickDataFeedRegistry.getCurrentPrice(latestOrder.asset).mul(latestOrder.newBotPrice).div(latestOrder.assetPrice) : latestOrder.newBotPrice;
+        return (latestOrder.isBuy) ? candlestickDataFeedRegistry.getCurrentPrice(latestOrder.asset, 1).mul(latestOrder.newBotPrice).div(latestOrder.assetPrice) : latestOrder.newBotPrice;
     }
 
     /* ========== RESTRICTED FUNCTIONS ========== */
