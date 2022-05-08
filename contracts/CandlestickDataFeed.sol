@@ -145,7 +145,7 @@ contract CandlestickDataFeed is ICandlestickDataFeed {
             return 2;
         }
 
-        if (block.timestamp > lastUpdated.add(MAX_TIME_BETWEEN_UPDATES)) {
+        if (block.timestamp > lastUpdated.add(timeframe.mul(60)).add(MAX_TIME_BETWEEN_UPDATES)) {
             return 1;
         }
 

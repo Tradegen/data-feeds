@@ -1,3 +1,3 @@
 CandlestickDataFeedRegistry: 0x1f19A758382F51811C5D429F30Ad78192C377383
-FeePool:
-BotPerformanceDataFeedRegistry:
+FeePool: 0xa78211CbB829F10C7bca4D2BB83C61F30F70c3e9
+BotPerformanceDataFeedRegistry: 0x8F51B3Ce8c8752077c81873d2CAd65a1b8e1156d

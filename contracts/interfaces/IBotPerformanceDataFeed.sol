@@ -67,7 +67,7 @@ interface IBotPerformanceDataFeed {
      * @param _asset Symbol of the asset.
      * @param _isBuy Whether the order is a 'buy' order
      * @param _price Price at which the order executed.
-      * @param _timestamp Timestamp when the order was executed.
+     * @param _timestamp Timestamp when the order was executed.
      */
     function updateData(string memory _asset, bool _isBuy, uint256 _price, uint256 _timestamp) external;
 
