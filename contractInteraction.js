@@ -12,6 +12,23 @@ const CANDLESTICK_DATA_FEED_REGISTRY_ADDRESS_MAINNET = "";
 const BOT_PERFORMANCE_DATA_FEED_REGISTRY_ADDRESS_TESTNET = "0x8F51B3Ce8c8752077c81873d2CAd65a1b8e1156d";
 const BOT_PERFORMANCE_DATA_FEED_REGISTRY_ADDRESS_MAINNET = "";
 
+const TRADING_BOT_REGISTRY_ADDRESS_TESTNET = "0xF37B01Bb1F0025656ca4435664C052cd0b5A8aFB";
+const TRADING_BOT_REGISTRY_ADDRESS_MAINNET = "";
+
+async function setBotPerformanceDataFeedRegistrar() {
+  const signers = await ethers.getSigners();
+  deployer = signers[0];
+  
+  let BotPerformanceDataFeedRegistryFactory = await ethers.getContractFactory('BotPerformanceDataFeedRegistry');
+  let botPerformanceDataFeedRegistry = BotPerformanceDataFeedRegistryFactory.attach(BOT_PERFORMANCE_DATA_FEED_REGISTRY_ADDRESS_TESTNET);
+  
+  let tx = await botPerformanceDataFeedRegistry.setRegistrar(TRADING_BOT_REGISTRY_ADDRESS_TESTNET);
+  await tx.wait();
+
+  let registrar = await botPerformanceDataFeedRegistry.registrar();
+  console.log(registrar);
+}
+
 async function registerCandlestickDataFeed(useTestnet, asset, timeframe, dataProvider) {
     const signers = await ethers.getSigners();
     deployer = signers[0];
@@ -69,14 +86,20 @@ async function getCurrentCandlestick(useTestnet, asset) {
   console.log(info);
 }
 
-
-registerCandlestickDataFeed(true, "BTC", 1440, "0xd0B64C57c4D5AD7a404b057B160e41bfA853dbac")
+setBotPerformanceDataFeedRegistrar()
   .then(() => process.exit(0))
   .catch(error => {
     console.error(error)
     process.exit(1)
   })
 /*
+registerCandlestickDataFeed(true, "BTC", 1440, "0xd0B64C57c4D5AD7a404b057B160e41bfA853dbac")
+  .then(() => process.exit(0))
+  .catch(error => {
+    console.error(error)
+    process.exit(1)
+  })
+
 getDataFeedInfo(true, "BTC")
   .then(() => process.exit(0))
   .catch(error => {
