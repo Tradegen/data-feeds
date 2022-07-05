@@ -40,20 +40,13 @@ interface IVTEDataFeedRegistry {
     function getDataFeedStatus(address _VTE) external view returns (uint256);
 
     /**
-    * @notice Given the address of a VTE, returns whether the VTE has a data feed.
-    * @param _VTE Address of the virtual trading environment.
-    * @return bool Whether the given VTE has a data feed.
-    */
-    function hasDataFeed(address _VTE) external view returns (bool);
-
-    /**
      * @notice Returns the order info for the given VTE at the given index.
      * @dev Returns 0 for each value if the VTE does not have a data feed or the given index is out of bounds.
      * @param _VTE Address of the virtual trading environment.
      * @param _index Index of the order.
-     * @return (string, bool, bool, uint256, uint256, uint256) Symbol of the asset, whether the order was a 'buy', whether the order is long or short, timestamp, asset's price, and leverage factor.
+     * @return (string, bool, bool, uint256, uint256, uint256) Symbol of the asset, whether the order was a 'buy', timestamp, asset's price, and leverage factor.
      */
-    function getOrderInfo(address _VTE, uint256 _index) external view returns (string memory, bool, bool, uint256, uint256, uint256);
+    function getOrderInfo(address _VTE, uint256 _index) external view returns (string memory, bool, uint256, uint256, uint256);
 
     /**
      * @notice Returns the current token price of the given VTE.

@@ -6,19 +6,17 @@ interface IVTEDataFeed {
     struct Order {
         string asset;
         bool isBuy;
-        bool isLong;
         uint256 timestamp;
         uint256 assetPrice;
         uint256 leverageFactor;
-        uint256 portfolioValue;
     }
 
     struct Position {
-        string asset;
         bool isLong;
         uint256 entryPrice;
         uint256 leverageFactor;
         uint256 portfolioValue;
+        string asset;
     }
 
     /**
@@ -75,12 +73,10 @@ interface IVTEDataFeed {
      *      makes a trade.
      * @param _asset Symbol of the asset.
      * @param _isBuy Whether the order is a 'buy' order.
-     * @param _isLong Whether the order is long or short.
      * @param _price Price at which the order executed.
      * @param _leverageFactor Amount of leverage used.
-     * @param _timestamp Timestamp when the order was executed.
      */
-    function updateData(string memory _asset, bool _isBuy, bool _isLong, uint256 _price, uint256 _leverageFactor, uint256 _timestamp) external;
+    function updateData(string memory _asset, bool _isBuy, uint256 _price, uint256 _leverageFactor) external;
 
     /**
     * @notice Updates the address of the data provider allowed to update this data feed.
@@ -92,9 +88,9 @@ interface IVTEDataFeed {
     /**
      * @notice Returns the order info at the given index.
      * @param _index Index of the order.
-     * @return (address, bool, bool, uint256, uint256, uint256) Symbol of the asset, whether the order was a 'buy', whether the order was long or short, timestamp, asset's price, and the leverage factor.
+     * @return (address, bool, uint256, uint256, uint256) Symbol of the asset, whether the order was a 'buy', timestamp, asset's price, and the leverage factor.
      */
-    function getOrderInfo(uint256 _index) external view returns (string memory, bool, bool, uint256, uint256, uint256);
+    function getOrderInfo(uint256 _index) external view returns (string memory, bool, uint256, uint256, uint256);
 
     /**
      * @notice Returns the current token price of the VTE.
