@@ -19,6 +19,13 @@ interface IVTEDataFeed {
         string asset;
     }
 
+    struct Params {
+        uint256 positiveCurrentValue;
+        uint256 negativeCurrentValue;
+        uint256 valueRemoved;
+        bool isPositive;
+    }
+
     /**
     * @notice Returns the address of this data feed's fee token.
     */

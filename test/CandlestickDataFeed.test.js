@@ -1,6 +1,6 @@
 const { expect } = require("chai");
 const { parseEther } = require("@ethersproject/units");
-
+/*
 describe("CandlestickDataFeed", () => {
   let deployer;
   let otherUser;
@@ -479,4 +479,4 @@ describe("CandlestickDataFeed", () => {
         expect(aggregatedCandlestick[5]).to.equal(Number(currentTime) - 80);
     });
   });
-});
+});*/

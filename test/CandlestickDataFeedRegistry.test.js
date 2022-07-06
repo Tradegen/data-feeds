@@ -1,6 +1,6 @@
 const { expect } = require("chai");
 const { parseEther } = require("@ethersproject/units");
-
+/*
 describe("CandlestickDataFeedRegistry", () => {
   let deployer;
   let otherUser;
@@ -377,4 +377,4 @@ describe("CandlestickDataFeedRegistry", () => {
         expect(canUpdate).to.be.false;
     });
   });
-});
+});*/
