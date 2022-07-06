@@ -252,18 +252,23 @@ contract VTEDataFeed is IVTEDataFeed {
             return 1e18;
         }
 
-        if (_positiveCurrentValue >= _negativeCurrentValue && _positiveCurrentValue.sub(_negativeCurrentValue) >= 1) {
-            return latestPortfolioValue.mul((_positiveCurrentValue.sub(_negativeCurrentValue)).add(1e18));
+        (uint256 caseNumber, uint256 scalar) = Utils.calculateCase(_positiveCurrentValue, _negativeCurrentValue);
+
+        // >=0% gain.
+        if (caseNumber == 1) {
+            return latestPortfolioValue.mul(scalar.add(1e18)).div(1e18);
         }
-        else if (_positiveCurrentValue >= _negativeCurrentValue && _positiveCurrentValue.sub(_negativeCurrentValue) > 0) {
-            return latestPortfolioValue.sub(latestPortfolioValue.mul(SCALING_FACTOR).mul(_positiveCurrentValue.sub(_negativeCurrentValue)).div(100));
+        // <100% loss.
+        else if (caseNumber == 2) {
+            return latestPortfolioValue.sub(latestPortfolioValue.mul(SCALING_FACTOR).mul(scalar).div(1e18).div(100));
         }
-        else if (_positiveCurrentValue == _negativeCurrentValue) {
+        // 100% loss.
+        else if (caseNumber == 3) {
             return latestPortfolioValue.mul(uint256(100).sub(SCALING_FACTOR)).div(100);
         }
 
-        // Negative values > positive values.
-        return latestPortfolioValue.mul(uint256(100).sub(SCALING_FACTOR)).div(100).mul(1e18).div(_negativeCurrentValue.add(1e18).sub(_positiveCurrentValue));
+        // >100% loss.
+        return latestPortfolioValue.mul(uint256(100).sub(SCALING_FACTOR)).div(100).mul(1e18).div(scalar);
     }
 
     /**
