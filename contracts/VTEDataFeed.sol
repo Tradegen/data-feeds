@@ -165,9 +165,9 @@ contract VTEDataFeed is IVTEDataFeed {
      * @param _leverageFactor Amount of leverage used.
      */
     function updateData(string memory _asset, bool _isBuy, uint256 _price, uint256 _leverageFactor) external override onlyDataProvider notHalted {
+        (uint256 positiveCurrentValue, uint256 negativeCurrentValue, uint256 valueRemoved, bool isPositive) = _calculateCurrentValues(_asset);
+        
         _updatePositions(_asset, _isBuy, _price, _leverageFactor);
-
-        (uint256 positiveCurrentValue, uint256 negativeCurrentValue) = _calculateCurrentValues();
 
         // Gas savings.
         uint256 index = numberOfUpdates.add(1);
@@ -201,7 +201,7 @@ contract VTEDataFeed is IVTEDataFeed {
         IERC20(feeToken).approve(address(feePool), usageFee);
         feePool.addFees(IVirtualTradingEnvironment(VTE).owner(), usageFee);
 
-        (uint256 positiveCurrentValue, uint256 negativeCurrentValue) = _calculateCurrentValues();
+        (uint256 positiveCurrentValue, uint256 negativeCurrentValue,,) = _calculateCurrentValues("");
         uint256 price = _calculateTokenPrice(positiveCurrentValue, negativeCurrentValue);
 
         emit GetTokenPrice(msg.sender, usageFee, price);
@@ -214,7 +214,7 @@ contract VTEDataFeed is IVTEDataFeed {
     /**
      * @notice Returns the sum of [(% change) * 1e18 / 100] for profitable/unprofitable positions.
      */
-    function _calculateCurrentValues() internal view returns (uint256 positiveCurrentValue, uint256 negativeCurrentValue) {
+    function _calculateCurrentValues(string memory _asset) internal view returns (uint256 positiveCurrentValue, uint256 negativeCurrentValue, uint256 valueRemoved, bool isPositive) {
         // Gas savings.
         uint256 positionCount = numberOfPositions;
 
@@ -226,21 +226,39 @@ contract VTEDataFeed is IVTEDataFeed {
             if (currentPrice >= position.entryPrice && position.isLong) {
                 uint256 amount = (currentPrice.sub(position.entryPrice)).mul(position.leverageFactor).div(position.entryPrice);
                 positiveCurrentValue = positiveCurrentValue.add(amount);
+
+                if (keccak256(abi.encodePacked(position.asset)) == keccak256(abi.encodePacked(_asset))) {
+                    isPositive = true;
+                    valueRemoved = amount;
+                }
             }
             // Profitable short position.
             else if (currentPrice <= position.entryPrice && !position.isLong) {
                 uint256 amount = (position.entryPrice.sub(currentPrice)).mul(position.leverageFactor).div(position.entryPrice);
                 positiveCurrentValue = positiveCurrentValue.add(amount);
+
+                if (keccak256(abi.encodePacked(position.asset)) == keccak256(abi.encodePacked(_asset))) {
+                    isPositive = true;
+                    valueRemoved = amount;
+                }
             }
             // Unprofitable long position. 
             else if (currentPrice < position.entryPrice && position.isLong) {
                 uint256 amount = (position.entryPrice.sub(currentPrice)).mul(position.leverageFactor).div(position.entryPrice);
                 negativeCurrentValue = negativeCurrentValue.add(amount);
+
+                if (keccak256(abi.encodePacked(position.asset)) == keccak256(abi.encodePacked(_asset))) {
+                    valueRemoved = amount;
+                }
             }
             // Unprofitable short position.
             else {
                 uint256 amount = (currentPrice.sub(position.entryPrice)).mul(position.leverageFactor).div(position.entryPrice);
                 negativeCurrentValue = negativeCurrentValue.add(amount);
+
+                if (keccak256(abi.encodePacked(position.asset)) == keccak256(abi.encodePacked(_asset))) {
+                    valueRemoved = amount;
+                }
             }
         }
     }
