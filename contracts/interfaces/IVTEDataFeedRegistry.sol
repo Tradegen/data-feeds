@@ -34,12 +34,6 @@ interface IVTEDataFeedRegistry {
     function lastUpdated(address _VTE) external view returns (uint256);
 
     /**
-    * @notice Returns the status of the given VTE's data feed.
-    * @param _VTE Address of the VTE.
-    */
-    function getDataFeedStatus(address _VTE) external view returns (uint256);
-
-    /**
      * @notice Returns the order info for the given VTE at the given index.
      * @dev Returns 0 for each value if the VTE does not have a data feed or the given index is out of bounds.
      * @param _VTE Address of the virtual trading environment.

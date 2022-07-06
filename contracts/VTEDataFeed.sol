@@ -2,6 +2,9 @@
 
 pragma solidity ^0.8.3;
 
+// Libraries.
+import "./libraries/Utils.sol";
+
 // Inheritance.
 import './interfaces/IVTEDataFeed.sol';
 
@@ -19,9 +22,6 @@ contract VTEDataFeed is IVTEDataFeed {
     using SafeERC20 for IERC20;
 
     /* ========== CONSTANTS ========== */
-
-    // Maximum number of seconds between data feed updates before the data feed is considered outdated.
-    uint256 public constant MAX_TIME_BETWEEN_UPDATES = 60;
 
     // Maximum usage fee is 1,000 fee tokens.
     uint256 public constant MAX_USAGE_FEE = 1e21;
@@ -44,9 +44,6 @@ contract VTEDataFeed is IVTEDataFeed {
 
     // Timestamp at which this data feed was created.
     uint256 public override createdOn;
-
-    // Whether the data feed is halted.
-    bool public isHalted;
 
     // Address of the user/contract responsible for supplying data to this contract.
     address public override dataProvider;
@@ -124,24 +121,6 @@ contract VTEDataFeed is IVTEDataFeed {
     }
 
     /**
-    * @notice Returns the status of this data feed.
-    * @dev 0 = Active.
-    * @dev 1 = Outdated.
-    * @dev 2 = Halted.
-    */
-    function getDataFeedStatus() external view override returns (uint256) {
-        if (isHalted) {
-            return 2;
-        }
-
-        if (block.timestamp > lastUpdated.add(MAX_TIME_BETWEEN_UPDATES)) {
-            return 1;
-        }
-
-        return 0;
-    }
-
-    /**
      * @notice Returns the order info at the given index.
      * @param _index Index of the order.
      * @return (address, bool, uint256, uint256, uint256) Symbol of the asset, whether the order was a 'buy', timestamp, asset's price, and the leverage factor.
@@ -164,10 +143,8 @@ contract VTEDataFeed is IVTEDataFeed {
      * @param _price Price at which the order executed.
      * @param _leverageFactor Amount of leverage used.
      */
-    function updateData(string memory _asset, bool _isBuy, uint256 _price, uint256 _leverageFactor) external override onlyDataProvider notHalted {
-        (uint256 positiveCurrentValue, uint256 negativeCurrentValue, uint256 valueRemoved, bool isPositive) = _calculateCurrentValues(_asset);
-        
-        _updatePositions(_asset, _isBuy, _price, _leverageFactor);
+    function updateData(string memory _asset, bool _isBuy, uint256 _price, uint256 _leverageFactor) external override onlyDataProvider {
+        (uint256 positiveCurrentValue, uint256 negativeCurrentValue) = _updatePositions(_asset, _isBuy, _price, _leverageFactor);
 
         // Gas savings.
         uint256 index = numberOfUpdates.add(1);
@@ -289,11 +266,20 @@ contract VTEDataFeed is IVTEDataFeed {
         return latestPortfolioValue.mul(uint256(100).sub(SCALING_FACTOR)).div(100).mul(1e18).div(_negativeCurrentValue.add(1e18).sub(_positiveCurrentValue));
     }
 
-    //TODO: Add comments.
-    function _updatePositions(string memory _asset, bool _isBuy, uint256 _price, uint256 _leverageFactor) internal {
+    /**
+     * @notice Updates the VTE's positions based on the latest order.
+     * @param _asset Symbol of the asset.
+     * @param _isBuy Whether the order represents a 'buy' order.
+     * @param _price Price at which the order executed.
+     * @param _leverageFactor Amount of leveraged used in the order; 18 decimals.
+     * @return (uint256, uint256) The total positive current value and the total negative current value.
+     */
+    function _updatePositions(string memory _asset, bool _isBuy, uint256 _price, uint256 _leverageFactor) internal returns (uint256, uint256) {
         // Gas savings.
         uint256 index = positionIndexes[_asset];
         Position memory position = positions[index];
+
+        (uint256 positiveCurrentValue, uint256 negativeCurrentValue, uint256 valueRemoved, bool isPositive) = _calculateCurrentValues(_asset);
 
         // Check if opening a position.
         if (position.leverageFactor == 0) {
@@ -312,11 +298,16 @@ contract VTEDataFeed is IVTEDataFeed {
             else {
                 positions[index].entryPrice = (_price.mul(position.entryPrice).mul(position.leverageFactor.add(_leverageFactor)).div(1e18)).div((position.entryPrice.mul(position.leverageFactor.add(_leverageFactor))).sub(position.leverageFactor.mul(position.entryPrice.sub(_price))));
             }
-            // TODO: Calculate new portfolio value.
+            
+            // Update portfolio value.
+            latestPortfolioValue = latestPortfolioValue.mul(Utils.calculateScalar(positiveCurrentValue, negativeCurrentValue, valueRemoved, isPositive)).div(1e18);
         }
         // Switch directions.
         else {
-            // TODO: Calculate new portfolio value before updating entry price.
+            // Update portfolio value.
+            latestPortfolioValue = latestPortfolioValue.mul(Utils.calculateScalar(positiveCurrentValue, negativeCurrentValue, valueRemoved, isPositive)).div(1e18);
+
+            // Reset position's entry price.
             positions[index].entryPrice = _price;
 
             if (position.leverageFactor >= _leverageFactor) {
@@ -339,6 +330,8 @@ contract VTEDataFeed is IVTEDataFeed {
             delete positions[numberOfPositions];
             numberOfPositions = numberOfPositions.sub(1);
         }
+
+        return (positiveCurrentValue, negativeCurrentValue);
     }
 
     /* ========== RESTRICTED FUNCTIONS ========== */
@@ -402,17 +395,11 @@ contract VTEDataFeed is IVTEDataFeed {
         _;
     }
 
-    modifier notHalted() {
-        require(!isHalted, "VTEDataFeed: This function cannot be called when the contract is halted.");
-        _;
-    }
-
     /* ========== EVENTS ========== */
 
     event UpdatedData(uint256 index, string asset, bool isBuy, uint256 assetPrice, uint256 leverageFactor, uint256 VTEPrice);
     event UpdatedDedicatedDataProvider(address newProvider);
     event SetOperator(address newOperator);
-    event HaltDataFeed(bool isHalted);
     event UpdatedUsageFee(uint256 newFee);
     event GetTokenPrice(address caller, uint256 amountPaid, uint256 tokenPrice);
 }

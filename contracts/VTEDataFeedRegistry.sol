@@ -114,29 +114,16 @@ contract VTEDataFeedRegistry is IVTEDataFeedRegistry, Ownable {
     }
 
     /**
-    * @notice Returns the status of the given VTE's data feed.
-    * @param _VTE Address of the VTE.
-    */
-    function getDataFeedStatus(address _VTE) external view override returns (uint256) {
-        address dataFeed = dataFeeds[_VTE];
-        if (dataFeed == address(0)) {
-            return 3;
-        }
-
-        return IVTEDataFeed(dataFeed).getDataFeedStatus();
-    }
-
-    /**
      * @notice Returns the order info for the given VTE at the given index.
      * @dev Returns 0 for each value if the VTE does not have a data feed or the given index is out of bounds.
      * @param _VTE Address of the virtual trading environment.
      * @param _index Index of the order.
-     * @return (string, bool, bool, uint256, uint256, uint256) Symbol of the asset, whether the order was a 'buy', timestamp, asset's price, and leverage factor.
+     * @return (string, bool, uint256, uint256, uint256) Symbol of the asset, whether the order was a 'buy', timestamp, asset's price, and leverage factor.
      */
     function getOrderInfo(address _VTE, uint256 _index) external view override returns (string memory, bool, uint256, uint256, uint256) {
         address dataFeed = dataFeeds[_VTE];
         if (dataFeed == address(0)) {
-            return ("", false, 0, 0);
+            return ("", false, 0, 0, 0);
         }
 
         return IVTEDataFeed(dataFeed).getOrderInfo(_index);
@@ -239,19 +226,6 @@ contract VTEDataFeedRegistry is IVTEDataFeedRegistry, Ownable {
         require(dataFeed != address(0), "VTEDataFeedRegistry: Data feed not found.");
 
         IVTEDataFeed(dataFeed).updateDedicatedDataProvider(_newProvider);
-    }
-
-    /**
-    * @notice Sets the given VTE's data feed's 'halted' status.
-    * @dev Only the operator of this contract can call this function.
-    * @param _VTE Address of the virtual trading environment.
-    * @param _isHalted Whether to mark the contract as 'halted'.
-    */
-    function haltDataFeed(address _VTE, bool _isHalted) external onlyOperator {
-        address dataFeed = dataFeeds[_VTE];
-        require(dataFeed != address(0), "VTEDataFeedRegistry: Data feed not found.");
-
-        IVTEDataFeed(dataFeed).haltDataFeed(_isHalted);
     }
 
     /* ========== MODIFIERS ========== */

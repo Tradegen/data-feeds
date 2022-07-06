@@ -43,14 +43,6 @@ interface IVTEDataFeed {
     function lastUpdated() external view returns (uint256);
 
     /**
-    * @notice Returns the status of this data feed.
-    * @dev 0 = Active.
-    * @dev 1 = Outdated.
-    * @dev 2 = Halted.
-    */
-    function getDataFeedStatus() external view returns (uint256);
-
-    /**
     * @notice Returns the timestamp at which the update at the given index was made.
     * @param _index Index in this data feed's history of updates.
     * @return uint256 Timestamp at which the update was made.
