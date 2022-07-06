@@ -59,6 +59,7 @@ interface IVTEDataFeedRegistry {
     * @param _VTE Address of the virtual trading environment.
     * @param _usageFee Number of fee tokens to charge whenever a contract queries the data feed.
     * @param _dedicatedDataProvider Address of the data provider responsible for this data feed.
+    * @return address Address of the created data feed.
     */
-    function registerDataFeed(address _VTE, uint256 _usageFee, address _dedicatedDataProvider) external;
+    function registerDataFeed(address _VTE, uint256 _usageFee, address _dedicatedDataProvider) external returns (address);
 }

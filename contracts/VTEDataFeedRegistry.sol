@@ -160,8 +160,9 @@ contract VTEDataFeedRegistry is IVTEDataFeedRegistry, Ownable {
     * @param _VTE Address of the virtual trading environment.
     * @param _usageFee Number of fee tokens to charge whenever a contract queries the data feed.
     * @param _dedicatedDataProvider Address of the data provider responsible for this data feed.
+    * @return address Address of the created data feed.
     */
-    function registerDataFeed(address _VTE, uint256 _usageFee, address _dedicatedDataProvider) external override onlyRegistrar {
+    function registerDataFeed(address _VTE, uint256 _usageFee, address _dedicatedDataProvider) external override onlyRegistrar returns (address) {
         require(dataFeeds[_VTE] == address(0), "VTEDataFeedRegistry: Already have a data feed for this VTE.");
         require(_usageFee >= 0, "VTEDataFeedRegistry: Usage fee must be positive.");
 
@@ -172,6 +173,8 @@ contract VTEDataFeedRegistry is IVTEDataFeedRegistry, Ownable {
         indexes[numberOfDataFeeds] = _VTE;
 
         emit RegisteredDataFeed(_VTE, _usageFee, _dedicatedDataProvider, dataFeed);
+
+        return dataFeed;
     }
 
     /**
