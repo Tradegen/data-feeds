@@ -288,9 +288,13 @@ contract VTEDataFeed is IVTEDataFeed {
 
         // Check if opening a position.
         if (position.leverageFactor == 0) {
-            numberOfPositions = numberOfPositions.add(1);
-            positionIndexes[_asset] = numberOfPositions;
-            index = numberOfPositions;
+            // Update local variables.
+            position.isLong = _isBuy;
+            index = numberOfPositions.add(1);
+
+            numberOfPositions = index;
+            positionIndexes[_asset] = index;
+            positions[index].isLong = _isBuy;
         }
 
         // If order is same direction as position, add to leverage factor.
@@ -304,10 +308,10 @@ contract VTEDataFeed is IVTEDataFeed {
                 positions[index].entryPrice = (_price.mul(position.entryPrice).mul(position.leverageFactor.add(_leverageFactor)).div(1e18)).div((position.entryPrice.mul(position.leverageFactor.add(_leverageFactor))).sub(position.leverageFactor.mul(position.entryPrice.sub(_price))));
             }
             
-            // Update portfolio value.
-            latestPortfolioValue = latestPortfolioValue.mul(Utils.calculateScalar(params.positiveCurrentValue, params.negativeCurrentValue, params.valueRemoved, params.isPositive)).div(1e18);
+            // Update local variable.
+            position.leverageFactor = position.leverageFactor.add(_leverageFactor);
         }
-        // Switch directions.
+        // Reduce position or switch directions.
         else {
             // Update portfolio value.
             latestPortfolioValue = latestPortfolioValue.mul(Utils.calculateScalar(params.positiveCurrentValue, params.negativeCurrentValue, params.valueRemoved, params.isPositive)).div(1e18);
@@ -317,10 +321,16 @@ contract VTEDataFeed is IVTEDataFeed {
 
             if (position.leverageFactor >= _leverageFactor) {
                 positions[index].leverageFactor = position.leverageFactor.sub(_leverageFactor);
+
+                // Update local variable.
+                position.leverageFactor = position.leverageFactor.sub(_leverageFactor);
             }
             else {
                 positions[index].leverageFactor = _leverageFactor.sub(position.leverageFactor);
                 positions[index].isLong = !position.isLong;
+
+                // Update local variable.
+                position.leverageFactor = _leverageFactor.sub(position.leverageFactor);
             }
         }
 

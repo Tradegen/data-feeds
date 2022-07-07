@@ -15,7 +15,6 @@ interface IVTEDataFeed {
         bool isLong;
         uint256 entryPrice;
         uint256 leverageFactor;
-        uint256 portfolioValue;
         string asset;
     }
 
