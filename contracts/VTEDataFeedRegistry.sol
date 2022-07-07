@@ -5,9 +5,7 @@ pragma solidity ^0.8.3;
 // Interfaces.
 import './interfaces/IVTEDataFeed.sol';
 import './interfaces/IVirtualTradingEnvironment.sol';
-
-// Internal references.
-import './VTEDataFeed.sol';
+import './interfaces/IVTEDataFeedFactory.sol';
 
 // Inheritance.
 import './interfaces/IVTEDataFeedRegistry.sol';
@@ -24,6 +22,7 @@ contract VTEDataFeedRegistry is IVTEDataFeedRegistry, Ownable {
     address immutable feeToken;
     address immutable feePool;
     address immutable oracle;
+    IVTEDataFeedFactory immutable factory;
 
     // Address of the user/contract that can update the settings of this contract.
     // Operator is initially the contract owner.
@@ -45,12 +44,13 @@ contract VTEDataFeedRegistry is IVTEDataFeedRegistry, Ownable {
 
     /* ========== CONSTRUCTOR ========== */
 
-    constructor(address _feePool, address _feeToken, address _oracle) Ownable() {
+    constructor(address _feePool, address _feeToken, address _oracle, address _factory) Ownable() {
         operator = msg.sender;
         registrar = msg.sender;
         feePool = _feePool;
         feeToken = _feeToken;
         oracle = _oracle;
+        factory = IVTEDataFeedFactory(_factory);
     }
 
     /* ========== VIEWS ========== */
@@ -166,7 +166,7 @@ contract VTEDataFeedRegistry is IVTEDataFeedRegistry, Ownable {
         require(dataFeeds[_VTE] == address(0), "VTEDataFeedRegistry: Already have a data feed for this VTE.");
         require(_usageFee >= 0, "VTEDataFeedRegistry: Usage fee must be positive.");
 
-        address dataFeed = address(new VTEDataFeed(_dedicatedDataProvider, address(this), feePool, oracle, _VTE, feeToken, _usageFee));
+        address dataFeed = factory.createVTEDataFeed(_VTE, msg.sender, _usageFee);
 
         dataFeeds[_VTE] = dataFeed;
         numberOfDataFeeds = numberOfDataFeeds.add(1);
