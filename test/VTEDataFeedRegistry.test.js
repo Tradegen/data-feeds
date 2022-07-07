@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 const { parseEther } = require("@ethersproject/units");
 const { factoryAbi } = require("@ubeswap/solidity-create2-deployer");
-
+/*
 describe("VTEDataFeedRegistry", () => {
   let deployer;
   let otherUser;
@@ -316,4 +316,4 @@ describe("VTEDataFeedRegistry", () => {
         expect(availableFees).to.equal(parseEther("1"));
     });
   });
-});
+});*/

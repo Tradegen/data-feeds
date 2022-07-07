@@ -64,6 +64,6 @@ contract VTEDataFeedFactory is IVTEDataFeedFactory, Ownable {
 
     /* ========== EVENTS ========== */
 
-    event CreatedVTEDataFeed(address VTE, address VTEData, uint256 usageFee);
+    event CreatedVTEDataFeed(address VTE, address VTEDataFeed, uint256 usageFee);
     event InitializedContract(address registryAddress);
 }
