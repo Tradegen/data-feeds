@@ -14,7 +14,7 @@ interface IVirtualTradingEnvironment {
     /**
      * @notice Returns the address of the VTE's owner.
      */
-    function owner() external view returns (address);
+    function VTEOwner() external view returns (address);
 
     /**
      * @notice Returns the address of the VTE's VirtualTradingEnvironmentDataFeed contract.
@@ -29,11 +29,10 @@ interface IVirtualTradingEnvironment {
     * @dev Transaction will revert if adding the given leverage factor exceeds the max leverage factor.
     * @param _asset Symbol of the asset.
     * @param _isBuy Whether the order represents a 'buy' order.
-    * @param _isLong Whether the order is going long.
     * @param _leverageFactor Amount of leverage to use; denominated by 100.
     *                        Ex) 2x leverage = 200; 0.25x leverage = 25.
     */
-    function placeOrder(string memory _asset, bool _isBuy, bool _isLong, uint256 _leverageFactor) external;
+    function placeOrder(string memory _asset, bool _isBuy, uint256 _leverageFactor) external;
 
     /**
     * @notice Simulates a market order to close the position in the given asset.

@@ -30,4 +30,16 @@ contract TestVTEDataFeed is VTEDataFeed {
             asset: _asset
         });
     }
+
+    function setNumberOfUpdates(uint256 _amount) external {
+        numberOfUpdates = _amount;
+    }
+
+    function setNumberOfPositions(uint256 _amount) external {
+        numberOfPositions = _amount;
+    }
+
+    function setLatestPortfolioValue(uint256 _amount) external {
+        latestPortfolioValue = _amount;
+    }
 }

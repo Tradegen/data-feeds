@@ -13,7 +13,7 @@ contract TestVirtualTradingEnvironment {
         user = _owner;
     }
 
-    function owner() external view returns (address) {
+    function VTEOwner() external view returns (address) {
         return user;
     }
 }

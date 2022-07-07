@@ -26,10 +26,6 @@ contract VTEDataFeed is IVTEDataFeed {
     // Maximum usage fee is 1,000 fee tokens.
     uint256 public constant MAX_USAGE_FEE = 1e21;
 
-    // Maximum increase of 20% at a time.
-    // Denominated in 10000.
-    uint256 public constant MAX_FEE_INCREASE = 2000;
-
     // Minimum amount of time between fee changes.
     uint256 public constant MIN_TIME_BETWEEN_FEE_CHANGES = 1 days;
 
@@ -91,7 +87,7 @@ contract VTEDataFeed is IVTEDataFeed {
     // Maps to index 0 if there is no position with the given symbol.
     mapping (string => uint256) public positionIndexes;
 
-    uint256 private latestPortfolioValue;
+    uint256 internal latestPortfolioValue;
 
     /* ========== CONSTRUCTOR ========== */
 
@@ -145,7 +141,7 @@ contract VTEDataFeed is IVTEDataFeed {
      */
     function updateData(string memory _asset, bool _isBuy, uint256 _price, uint256 _leverageFactor) external override onlyDataProvider {
         (uint256 positiveCurrentValue, uint256 negativeCurrentValue) = _updatePositions(_asset, _isBuy, _price, _leverageFactor);
-
+        
         // Gas savings.
         uint256 index = numberOfUpdates.add(1);
         uint256 VTEPrice = _calculateTokenPrice(positiveCurrentValue, negativeCurrentValue);
@@ -176,7 +172,7 @@ contract VTEDataFeed is IVTEDataFeed {
 
         // Transfers the usage fee to the VTE owner via FeePool contract.
         IERC20(feeToken).approve(address(feePool), usageFee);
-        feePool.addFees(IVirtualTradingEnvironment(VTE).owner(), usageFee);
+        feePool.addFees(IVirtualTradingEnvironment(VTE).VTEOwner(), usageFee);
 
         Params memory params = _calculateCurrentValues("");
         uint256 price = _calculateTokenPrice(params.positiveCurrentValue, params.negativeCurrentValue);
@@ -295,17 +291,26 @@ contract VTEDataFeed is IVTEDataFeed {
             numberOfPositions = index;
             positionIndexes[_asset] = index;
             positions[index].isLong = _isBuy;
+            positions[index].asset = _asset;
         }
 
         // If order is same direction as position, add to leverage factor.
         if ((position.isLong && _isBuy) || (!position.isLong && !_isBuy)) {
             positions[index].leverageFactor = position.leverageFactor.add(_leverageFactor);
             // Calculate new entry price.
-            if (position.isLong) {
-                positions[index].entryPrice = (_price.mul(position.entryPrice).mul(position.leverageFactor.add(_leverageFactor)).div(1e18)).div((position.leverageFactor.mul(_price.sub(position.entryPrice))).add(position.entryPrice.mul(position.leverageFactor.add(_leverageFactor))));
+            // New position.
+            if (position.entryPrice == 0) {
+                positions[index].entryPrice = _price;
             }
+            // Adding to long position.
+            else if (position.isLong) {
+                uint256 denominator = _price >= position.entryPrice ? (position.leverageFactor.mul(_price.sub(position.entryPrice))).add(position.entryPrice.mul(position.leverageFactor.add(_leverageFactor))) : (position.entryPrice.mul(position.leverageFactor.add(_leverageFactor))).sub((position.leverageFactor.mul(position.entryPrice.sub(_price))));
+                positions[index].entryPrice = (_price.mul(position.entryPrice).mul(position.leverageFactor.add(_leverageFactor))).div(denominator);
+            }
+            // Adding to short position.
             else {
-                positions[index].entryPrice = (_price.mul(position.entryPrice).mul(position.leverageFactor.add(_leverageFactor)).div(1e18)).div((position.entryPrice.mul(position.leverageFactor.add(_leverageFactor))).sub(position.leverageFactor.mul(position.entryPrice.sub(_price))));
+                uint256 denominator = _price <= position.entryPrice ? (position.entryPrice.mul(position.leverageFactor.add(_leverageFactor))).sub((position.leverageFactor.mul(position.entryPrice.sub(_price)))) : (position.leverageFactor.mul(_price.sub(position.entryPrice))).add(position.entryPrice.mul(position.leverageFactor.add(_leverageFactor)));
+                positions[index].entryPrice = (_price.mul(position.entryPrice).mul(position.leverageFactor.add(_leverageFactor))).div(denominator);
             }
             
             // Update local variable.
@@ -381,11 +386,6 @@ contract VTEDataFeed is IVTEDataFeed {
     function updateUsageFee(uint256 _newFee) external override onlyVTEOwner {
         require(_newFee <= MAX_USAGE_FEE, "VTEDataFeed: New usage fee cannot be greater than the max usage fee.");
         require(block.timestamp.sub(lastFeeChangeTimestamp) >= MIN_TIME_BETWEEN_FEE_CHANGES, "VTEDataFeed: Not enough time between fee changes.");
-        
-        if (_newFee > usageFee) {
-            uint256 feeIncrease = (_newFee.sub(usageFee)).mul(10000).div(usageFee);
-            require(feeIncrease <= MAX_FEE_INCREASE, "VTEDataFeed: Fee increase is too large.");
-        }
 
         usageFee = _newFee;
         lastFeeChangeTimestamp = block.timestamp;
@@ -406,7 +406,7 @@ contract VTEDataFeed is IVTEDataFeed {
     }
 
     modifier onlyVTEOwner() {
-        require(msg.sender == IVirtualTradingEnvironment(VTE).owner(), "VTEDataFeed: Only the VTE owner can call this function.");
+        require(msg.sender == IVirtualTradingEnvironment(VTE).VTEOwner(), "VTEDataFeed: Only the VTE owner can call this function.");
         _;
     }
 

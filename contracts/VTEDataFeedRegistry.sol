@@ -96,7 +96,7 @@ contract VTEDataFeedRegistry is IVTEDataFeedRegistry, Ownable {
             return (address(0), address(0), address(0), address(0), 0);
         }
 
-        return (dataFeed, _VTE, IVirtualTradingEnvironment(_VTE).owner(), IVTEDataFeed(dataFeed).dataProvider(), IVTEDataFeed(dataFeed).usageFee());
+        return (dataFeed, _VTE, IVirtualTradingEnvironment(_VTE).VTEOwner(), IVTEDataFeed(dataFeed).dataProvider(), IVTEDataFeed(dataFeed).usageFee());
     }
 
     /**
