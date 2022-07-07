@@ -1,6 +1,6 @@
 const { expect } = require("chai");
 const { parseEther } = require("@ethersproject/units");
-
+/*
 describe("Utils", () => {
   let deployer;
   let otherUser;
@@ -23,7 +23,7 @@ describe("Utils", () => {
     await utils.deployed();
     utilsAddress = utils.address;
   });
-  /*
+  
   describe("#calculateCase", () => {
     it("case 1", async () => {
         let data = await utils.calculateCase(parseEther("5"), parseEther("4"));
@@ -48,7 +48,7 @@ describe("Utils", () => {
         expect(data[0]).to.equal(4);
         expect(data[1]).to.equal(parseEther("2"));
     });
-  });*/
+  });
 
   describe("#calculateScalar", () => {
     it("case 1 -> case 1", async () => {
@@ -131,4 +131,4 @@ describe("Utils", () => {
         expect(scalar).to.equal("1090909090909090909");
     });
   });
-});
+});*/
