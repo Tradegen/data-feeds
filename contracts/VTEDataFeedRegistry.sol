@@ -166,7 +166,7 @@ contract VTEDataFeedRegistry is IVTEDataFeedRegistry, Ownable {
         require(dataFeeds[_VTE] == address(0), "VTEDataFeedRegistry: Already have a data feed for this VTE.");
         require(_usageFee >= 0, "VTEDataFeedRegistry: Usage fee must be positive.");
 
-        address dataFeed = factory.createVTEDataFeed(_VTE, msg.sender, _usageFee);
+        address dataFeed = factory.createVTEDataFeed(_VTE, _usageFee);
 
         dataFeeds[_VTE] = dataFeed;
         numberOfDataFeeds = numberOfDataFeeds.add(1);

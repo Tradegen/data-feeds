@@ -1,5 +1,6 @@
 const { expect } = require("chai");
 const { parseEther } = require("@ethersproject/units");
+const { factoryAbi } = require("@ubeswap/solidity-create2-deployer");
 
 describe("VTEDataFeedRegistry", () => {
   let deployer;
@@ -31,20 +32,32 @@ describe("VTEDataFeedRegistry", () => {
   let oracleAddress;
   let OracleFactory;
 
-  let mockVTEDataFeed;
   let VTEDataFeed;
   let VTEDataFeedAddress;
   let VTEDataFeedFactory;
 
+  let VTEDataFeedFactoryContract;
+  let VTEDataFeedFactoryContractAddress;
+  let VTEDataFeedFactoryFactory;
+
   let VTEDataFeedRegistry;
   let VTEDataFeedRegistryAddress;
   let VTEDataFeedRegistryFactory;
+
+  let utils;
+  let utilsAddress;
+  let UtilsFactory;
 
   before(async () => {
     const signers = await ethers.getSigners();
 
     deployer = signers[0];
     otherUser = signers[1];
+
+    UtilsFactory = await ethers.getContractFactory('Utils');
+    utils = await UtilsFactory.deploy();
+    await utils.deployed();
+    utilsAddress = utils.address;
 
     TokenFactory = await ethers.getContractFactory('TestTokenERC20');
     VTEFactory = await ethers.getContractFactory('TestVirtualTradingEnvironment');
@@ -53,7 +66,16 @@ describe("VTEDataFeedRegistry", () => {
     CandlestickDataFeedRegistryFactory = await ethers.getContractFactory('CandlestickDataFeedRegistry');
     OracleFactory = await ethers.getContractFactory('Oracle');
     RegistryFactory = await ethers.getContractFactory('CandlestickDataFeedRegistry');
-    VTEDataFeedFactory = await ethers.getContractFactory('TestVTEDataFeed');
+    VTEDataFeedFactory = await ethers.getContractFactory('VTEDataFeed', {
+      libraries: {
+          Utils: utilsAddress,
+      },
+    });
+    VTEDataFeedFactoryFactory = await ethers.getContractFactory('VTEDataFeedFactory', {
+      libraries: {
+          Utils: utilsAddress,
+      },
+    });
     VTEDataFeedRegistryFactory = await ethers.getContractFactory('VTEDataFeedRegistry');
 
     candlestickDataFeedRegistry = await CandlestickDataFeedRegistryFactory.deploy();
@@ -84,15 +106,18 @@ describe("VTEDataFeedRegistry", () => {
     await oracle.deployed();
     oracleAddress = oracle.address;
 
-    mockVTEDataFeed = await VTEDataFeedFactory.deploy(deployer.address, deployer.address, feePoolAddress, oracleAddress, VTEAddress, feeTokenAddress, parseEther("1"));
-    await VTEDataFeed.deployed();
-    VTEDataFeedAddress = VTEDataFeed.address;
+    VTEDataFeedFactoryContract = await VTEDataFeedFactoryFactory.deploy(oracleAddress, feePoolAddress, feeTokenAddress);
+    await VTEDataFeedFactoryContract.deployed();
+    VTEDataFeedFactoryContractAddress = VTEDataFeedFactoryContract.address;
   });
 
   beforeEach(async () => {
-    VTEDataFeedRegistry = await VTEDataFeedRegistryFactory.deploy(feePoolAddress, feeTokenAddress, oracleAddress);
+    VTEDataFeedRegistry = await VTEDataFeedRegistryFactory.deploy(feePoolAddress, feeTokenAddress, oracleAddress, VTEDataFeedFactoryContractAddress);
     await VTEDataFeedRegistry.deployed();
     VTEDataFeedRegistryAddress = VTEDataFeedRegistry.address;
+
+    let tx = await VTEDataFeedFactoryContract.initializeContract(VTEDataFeedRegistryAddress);
+    await tx.wait();
   });
   
   describe("#registerDataFeed", () => {
@@ -108,6 +133,8 @@ describe("VTEDataFeedRegistry", () => {
         let tx = await VTEDataFeedRegistry.registerDataFeed(VTEAddress, parseEther("1"), deployer.address);
         await tx.wait();
 
+        VTEDataFeedAddress = await VTEDataFeedRegistry.dataFeeds(VTEAddress);
+
         let numberOfDataFeeds = await VTEDataFeedRegistry.numberOfDataFeeds();
         expect(numberOfDataFeeds).to.equal(1);
 
@@ -121,7 +148,7 @@ describe("VTEDataFeedRegistry", () => {
         expect(dataFeedInfo[0]).to.equal(VTEDataFeedAddress);
         expect(dataFeedInfo[1]).to.equal(VTEAddress);
         expect(dataFeedInfo[2]).to.equal(otherUser.address);
-        expect(dataFeedInfo[3]).to.equal(deployer.address);
+        expect(dataFeedInfo[3]).to.equal(VTEAddress);
         expect(dataFeedInfo[4]).to.equal(parseEther("1"));
     });
 
@@ -202,7 +229,7 @@ describe("VTEDataFeedRegistry", () => {
         VTEDataFeed = VTEDataFeedFactory.attach(VTEDataFeedAddress);
 
         let dataProvider = await VTEDataFeed.dataProvider();
-        expect(dataProvider).to.equal(deployer.address);
+        expect(dataProvider).to.equal(VTEAddress);
     });
 
     it("data feed not found", async () => {

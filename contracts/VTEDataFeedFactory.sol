@@ -29,12 +29,11 @@ contract VTEDataFeedFactory is IVTEDataFeedFactory, Ownable {
     * @notice Deploys a VTEDataFeed contract and returns the contract's address.
     * @dev This function can only be called by the VTEDataFeedRegistry contract.
     * @param _VTE Address of the VirtualTradingEnvironment contract.
-    * @param _operator Address of the VTE owner.
     * @param _usageFee Fee that a user pays whenever they request data for this VTE.
     * @return address Address of the deployed VTEDataFeed contract.
     */
-    function createVTEDataFeed(address _VTE, address _operator, uint256 _usageFee) external override onlyVTEDataFeedRegistry returns (address) {
-        address VTEDataFeedAddress = address(new VTEDataFeed(_VTE, _operator, feePool, oracle, _VTE, feeToken, _usageFee));
+    function createVTEDataFeed(address _VTE, uint256 _usageFee) external override onlyVTEDataFeedRegistry returns (address) {
+        address VTEDataFeedAddress = address(new VTEDataFeed(_VTE, VTEDataFeedRegistry, feePool, oracle, _VTE, feeToken, _usageFee));
 
         emit CreatedVTEDataFeed(_VTE, VTEDataFeedAddress, _usageFee);
 
