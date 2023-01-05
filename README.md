@@ -1,22 +1,37 @@
 # Tradegen Data Feeds
 
-Tradegen is a decentralized trading platform that focuses on asset management, algo trading, and virtual trading. These smart contracts candlestick data for major cryptos, the performance of trading bots in simulated trades, and the performance of virtual trading environments (VTEs). 
+## Purpose
 
-## Candlestick Data
+Create a decentralized API for candlestick data for major cryptos, the performance of trading bots in simulated trades, and the performance of virtual trading environments (VTEs). 
 
-Price data for major cryptos comes from a public API, and is relayed to data feeds once per minute by keeper scripts running on GCP cloud functions. Each crypto has one or more timeframes (1-minute, 5-minute, 1-hour, or 1-day). The data is aggregated into candlesticks containing the open price, close price, high price, low price, and volume over the timeframe. 
+## System Design
 
-## Trading Bot Performance Data
+### Candlestick Data
+
+Price data for major cryptos comes from a public API and is relayed to data feeds once per minute by keeper scripts running on GCP cloud functions. Each crypto has one or more timeframes (1-minute, 5-minute, 1-hour, or 1-day). The data is aggregated into candlesticks containing the open price, close price, high price, low price, and volume over the timeframe. 
+
+### Trading Bot Performance Data
 
 Data feeds for trading bots are updated by the associated trading bot contract whenever the bot makes a simulated trade. Trading bots are updated once per minute by keeper scripts that call the trading bot contract with the latest oracle data.
 
 The performance of a trading bot is measured as a price that starts at $1.00 and fluctuates based on the bot's lifetime performance. For example, a bot with a lifetime return of +50% will have a $1.50 price and a bot with -30% lifetime return will have a $0.70 price. 
 
-## VTE Performance Data
+### VTE Performance Data
 
 Data feeds for VTEs are updated by the associated VTE contract whenever the VTE owner makes a simulated trade. Unlike trading bots, VTEs are not maintained by keepers; instead, they are updated manually by the VTE owner. 
 
 The performance of a VTE is measured similarly to that of a trading bot.
+
+### Smart Contracts
+
+* BotPerformanceDataFeed - Tracks the lifetime performance of a trading bot.
+* BotPerformanceDataFeedRegistry - Creates/tracks BotPerformanceDataFeed contracts and provides a function for requesting data from a BotPerformanceDataFeed.
+* CandlestickDataFeed - Aggregates the price data of a major crypto into a candlestick.
+* CandlestickDataFeedRegistry - Creates/tracks CandlestickDataFeed contracts and provides a function for requesting data from a CandlestickDataFeed.
+* FeePool - Stores 'data usage' fees collected by BotPerformanceDataFeeds and VTEDataFeeds.
+* VTEDataFeed - Tracks the lifetime performance of a virtual trading environment.
+* VTEDataFeedFactory - Creates a VTEDataFeed contract when registering a VTE data feed.
+* VTEDataFeedRegistry - Creates/Tracks VTEDataFeeds and provides a function for requesting data from a VTEDataFeed.
 
 ## Disclaimer
 
