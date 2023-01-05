@@ -33,6 +33,21 @@ The performance of a VTE is measured similarly to that of a trading bot.
 * VTEDataFeedFactory - Creates a VTEDataFeed contract when registering a VTE data feed.
 * VTEDataFeedRegistry - Creates/Tracks VTEDataFeeds and provides a function for requesting data from a VTEDataFeed.
 
+## Repository Structure
+
+```
+.
+├── abi  ## Generated ABIs that developers can use to interact with the system.
+├── addresses  ## Address of each deployed contract, organized by network.
+├── contracts  ## All source code.
+│   ├── interfaces  ## Interfaces used for defining/calling contracts.
+│   ├── libraries  ## Helper functions used throughout the protocol.
+│   ├── openzeppelin-solidity  ## Helper contracts provided by OpenZeppelin.
+│   ├── test  ## Mock contracts used for testing main contracts.
+├── keeper script ## Keeper scripts for different data feed types.
+├── test ## Source code for testing code in //contracts.
+```
+
 ## Disclaimer
 
 These smart contracts  have not been audited yet.
