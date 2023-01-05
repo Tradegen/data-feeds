@@ -20,13 +20,19 @@ The performance of a VTE is measured similarly to that of a trading bot.
 
 ## Disclaimer
 
-These smart contracts are deployed on testnet but they have not been audited yet.
+These smart contracts  have not been audited yet.
 
-Price data comes from a centralized source and is not checked for quality. Keeper scripts are operated by Tradegen.
+Candlestick price data comes from a centralized source and is not checked for quality. Keeper scripts are operated by Tradegen.
 
-## Docs
+## Documentation
 
-Docs are available at https://docs.tradegen.io
+To learn more about the Tradegen project, visit the docs at https://docs.tradegen.io.
+
+This protocol is launched on the Celo blockchain. To learn more about Celo, visit their home page: https://celo.org/.
+
+Source code for trading bots: https://github.com/Tradegen/algo-trading.
+
+Source code for virtual trading environments (VTE): https://github.com/Tradegen/virtual-trading-environments.
 
 ## License
 
